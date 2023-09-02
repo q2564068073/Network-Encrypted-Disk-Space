@@ -61,7 +61,7 @@ def rc4_decrypt(data: bytes, key: bytes):
     cipher = ARC4.new(key)
     return cipher.decrypt(data)
 
-def get_hash(data: bytes):
+def get_key_hash(data: bytes):
     return hashlib.sha256(data).hexdigest()
 
 def create_signature(data: bytes, priv_key: bytes):
@@ -82,3 +82,6 @@ def verify_signature(data: bytes, signature: bytes, pub_key: bytes):
 
 def get_random_number():
     return int(get_random_bytes(16))
+
+def create_session_key(a: bytes, b: bytes, c: bytes):
+    return a + b + c
