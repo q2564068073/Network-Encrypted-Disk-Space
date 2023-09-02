@@ -24,11 +24,34 @@ def rsa_encrypt(data: bytes, pub_key: bytes):
 def rsa_decrypt(data: bytes, priv_key: bytes):
     key = RSA.importKey(priv_key)
     cipher = PKCS1_cipher.new(key)
-    str_data = cipher.decrypt(data).decode('utf-8')
+    str_data = cipher.decrypt(data, 0).decode('utf-8')
     return str_data
 
-def create_rc4_key():
-    return get_random_bytes(16)
+def rc4_key_schedule(seed: bytes):
+    S = list(range(256))
+    T = [ord(seed[i % len(seed)]) for i in range(256)]
+
+    j = 0
+    for i in range(256):
+        j = (j + S[i] + T[i]) % 256
+        S[i], S[j] = S[j], S[i]
+
+    return S
+
+def generate_rc4_keystream(S: list, data_length: int):
+    i = 0
+    j = 0
+
+    keystream = []
+    for _ in range(data_length):
+        i = (i + 1) % 256
+        j = (j + S[i]) % 256
+        S[i], S[j] = S[j], S[i]
+        t = (S[i] + S[j]) % 256
+        keystream_byte = S[t]
+        keystream.append(keystream_byte)
+
+    return bytes(''.join(keystream))
 
 def rc4_encrypt(data: bytes, key: bytes):
     cipher = ARC4.new(key)
