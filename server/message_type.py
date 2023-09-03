@@ -214,6 +214,22 @@ def send_phone(phone, auth_code):
     urllib.request.urlopen(send_url)  # 发送请求
 
 
+# 存储共享空间的字典，每个共享空间包含成员和文件
+shared_spaces = {}
+def create_shared_space(username,space_name):
+    shared_spaces[space_name] = {'members': set(), 'files': {}}
+    add_user_to_shared_space(username,space_name)
+    return f"共享空间 '{space_name}' 创建成功"
+
+def add_user_to_shared_space(username, space_name):
+    k=check_username(username)
+    if k==1 and space_name in shared_spaces:
+        shared_spaces[space_name]['members'].add(username)
+        return f"用户 '{username}' 已加入共享空间 '{space_name}'"
+    else:
+        return "用户或共享空间不存在"
+
+
 def make_folder(path, folder_name):
     os.mkdir(path + folder_name)
 
