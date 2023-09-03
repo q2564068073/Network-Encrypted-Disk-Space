@@ -54,24 +54,27 @@ def login_check_password(username,password):
     charset=SERVER_DB['charset']
     )
     cursor = conn.cursor()
-    
+    print("连接可以了")
     #检查用户名存在情况
-    cursor.execute("SELECT * FROM users WHERE username=?",(username,))
-    user = cursor.fetchone() #这里的user是一个完整的查询结果，(username,password,...)
-    if user is None:
-        #用户名是不存在的，要提醒一下没有这个人
-        conn.close()
-        return 0
-    else:  
-        stored_password = user[1] #按照数组的顺序
-        
-        if password == stored_password:
+    try:
+        cursor.execute("SELECT * FROM users WHERE username=%s",(username,))
+        user = cursor.fetchone() #这里的user是一个完整的查询结果，(username,password,...)
+        if user is None:
+            #用户名是不存在的，要提醒一下没有这个人
             conn.close()
-            return 2 #这里是登录成功了，记得给一个返回值
-        else:
-            conn.close()
-            return 1 #这里是密码错误了，记得返回登录失败
-    
+            return 0
+        else:  
+            stored_password = user[1] #按照数组的顺序
+            
+            if password == stored_password:
+                conn.close()
+                return 2 #这里是登录成功了，记得给一个返回值
+            else:
+                conn.close()
+                return 1 #这里是密码错误了，记得返回登录失败
+    except Exception as e:
+        print("Error:",e)
+        return -1
 
 #登录方式2：通过邮箱和验证码登录
 def login_check_email(email):
