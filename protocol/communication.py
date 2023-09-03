@@ -1,7 +1,10 @@
-import sys
-
 from ..server.server import*
 from encryption_utils import*
+from cryptography import x509
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.hashes import SHA256
 
 class encrypted_socket:
     def __init__(self,socket,address = None,port = None):
@@ -62,7 +65,7 @@ class encrypted_socket:
                     message_type = message_parts[0]
                     if message_type == 'Server_Hello':
                         key_second = message_parts[1]
-                        if message_parts[2]:
+                        if self.certificate_permit(message_parts[2]) :
                             raise Exception("网站验证失败！")
                         client_key = message_parts[3]
 
@@ -92,8 +95,40 @@ class encrypted_socket:
         return response
 
 
-    def certificate_permit(self,certificate):
-        if certificate:
+    def certificate_permit(self, certificate):
+        with open("private.pem", "rb") as private:
+            cert_data = certificate
+            private_key = private.read()
+
+        # 加载私钥
+        private_key = serialization.load_pem_private_key(private_key, password=None, backend=default_backend())
+
+        # 提取公钥
+        public_key = private_key.public_key()
+        
+        # 解析证书
+        cert = x509.load_pem_x509_certificate(cert_data, default_backend())
+
+        # 提取证书中的签名
+        signature = cert.signature
+
+        # 提取证书中的数据
+        data = cert.tbs_certificate_bytes
+
+        # 加载公钥
+        public_key = serialization.load_pem_public_key(public_key, default_backend())
+
+        # 验证签名
+        try:
+            public_key.verify(
+                signature,
+                data,
+                padding.PKCS1v15(),
+                SHA256()
+            )
+            print("数字证书验证成功！")
             return False
-        return True
+        except Exception as e:
+            print(f"数字证书验证失败: {e}")
+            return True
 
