@@ -4,6 +4,9 @@ import hashlib #加密
 import os
 from flask import Flask
 from config import *
+import base64
+import time
+import socket
 from sql_init import *
 
 email_code_storage = {}
@@ -52,7 +55,12 @@ def get_email_code(email):
         return 0   #"邮箱不存在"
     elif sql_response == 1:
         email_message = str("【加密网盘】您的验证码为" + AUTH_CODE + "，30秒内有效。若非本人操作，请忽略此消息。")
-        send_email(email, email_message)
+        k=send_email(email, email_message)
+        if k:
+            print('发送成功')
+        else:
+            print('发送失败')
+            return 2
         #把正确的email和验证码对应起来放在全局变量里面，等一下需要再次验证
         email_code_storage[email] = AUTH_CODE
         return 1
@@ -114,7 +122,79 @@ def md5s(strs):
 
 #给邮件发送验证码
 def send_email(email, email_message):
-    pass
+    smtp_server = 'smtp.qq.com'  # 你的邮件服务器地址
+    smtp_port = 25  # 邮件服务器端口号
+    sender_email = '498618798@qq.com'  # 你的邮箱地址
+    sender_password = 'ueaoenpgwgdgbjcg'  # 你的邮箱密码
+    recipient_email=email
+    subject = '验证码'
+
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+            client_socket.connect((smtp_server, smtp_port))
+
+            # 接收服务器返回的连接信息
+            response = client_socket.recv(1024).decode()
+
+
+            ehlo = "ehlo smtp.qq.com\r\n"
+            client_socket.send(ehlo.encode())
+            response = client_socket.recv(1024).decode()
+
+
+            auth = f"auth login\r\n"
+            client_socket.send(auth.encode())
+
+            auth = f"{base64.b64encode(bytes(sender_email, 'utf-8')).decode('utf-8')}\r\n"
+            client_socket.send(auth.encode())
+
+            auth = f"{base64.b64encode(bytes(sender_password, 'utf-8')).decode('utf-8')}\r\n"
+            client_socket.send(auth.encode())
+
+            time.sleep(0.5)
+
+            # 发送发件人信息
+            mail_from_command = f'mail from: <{sender_email}>\r\n'
+            client_socket.send(mail_from_command.encode())
+            response = client_socket.recv(1024).decode()
+
+
+            # 发送收件人信息
+            rcpt_to_command = f'rcpt to: <{recipient_email}>\r\n'
+            client_socket.send(rcpt_to_command.encode())
+            response = client_socket.recv(1024).decode()
+
+
+            # 发送数据命令
+            data_command = 'data\r\n'
+            client_socket.send(data_command.encode())
+
+            From = f"From: <{sender_email}>\r\n"
+            client_socket.send(From.encode())
+
+            To = f"To: <{recipient_email}>\r\n"
+            client_socket.send(To.encode())
+
+            Subject = f"Subject: {subject}\r\n\r\n"
+            client_socket.send(Subject.encode())
+
+            Message = f"{email_message}\r\n"
+            client_socket.send(Message.encode())
+
+            end = ".\r\n"
+            client_socket.send(end.encode())
+
+            # 断开连接
+            quit_command = 'QUIT\r\n'
+            client_socket.send(quit_command.encode())
+            response = client_socket.recv(1024).decode()
+
+        return True
+    except Exception as e:
+
+        return False
+
+
 
 #给特定的手机号发送验证码
 def send_phone(phone, auth_code):
