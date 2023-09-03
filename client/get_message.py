@@ -96,3 +96,22 @@ def chec_phone_number(phone_number):
   else:
     k=2
   return k
+
+class GetEmailVerificationCode:
+  def get_message(self,email):
+    """
+    获取邮箱验证码
+    :param email:
+    :return:
+    """
+    message = "get_email_code|" + email
+    return message
+class GetPhoneVerificationCode:
+  def get_message(self,phone_number):
+    """
+    获取手机验证码
+    :param phone_number:
+    :return:
+    """
+    message = "get_phone_code|" + phone_number
+    return message
