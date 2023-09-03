@@ -13,19 +13,19 @@ def create_rsa_key():
     key = RSA.generate(2048, random_generator)
     pub_key = key.publickey().exportKey()
     priv_key = key.exportKey()
-    return pub_key, priv_key
+    return pub_key.decode('utf-8'), priv_key.decode('utf-8')
 
-def rsa_encrypt(data: bytes, pub_key: bytes):
+def rsa_encrypt(data: bytes, pub_key: bytes) -> str:
     key = RSA.importKey(pub_key)
     cipher = PKCS1_cipher.new(key)
-    data = cipher.encrypt(data)
+    data = cipher.encrypt(data).decode('utf-8')
     return data
 
-def rsa_decrypt(data: bytes, priv_key: bytes):
+def rsa_decrypt(data: bytes, priv_key: bytes) -> str:
     key = RSA.importKey(priv_key)
     cipher = PKCS1_cipher.new(key)
-    str_data = cipher.decrypt(data, 0).decode('utf-8')
-    return str_data
+    data = cipher.decrypt(data, 0).decode('utf-8')
+    return data
 
 def rc4_key_schedule(seed: bytes):
     S = list(range(256))
@@ -38,7 +38,7 @@ def rc4_key_schedule(seed: bytes):
 
     return S
 
-def generate_rc4_keystream(S: list, data_length: int):
+def generate_rc4_keystream(S: list, data_length: int) -> str:
     i = 0
     j = 0
 
@@ -51,24 +51,24 @@ def generate_rc4_keystream(S: list, data_length: int):
         keystream_byte = S[t]
         keystream.append(keystream_byte)
 
-    return bytes(''.join(keystream))
+    return ''.join(keystream)
 
-def rc4_encrypt(data: bytes, key: bytes):
+def rc4_encrypt(data: bytes, key: bytes) -> str:
     cipher = ARC4.new(key)
-    return cipher.encrypt(data)
+    return cipher.encrypt(data).decode('utf-8')
 
-def rc4_decrypt(data: bytes, key: bytes):
+def rc4_decrypt(data: bytes, key: bytes) -> str:
     cipher = ARC4.new(key)
-    return cipher.decrypt(data)
+    return cipher.decrypt(data).decode('utf-8')
 
-def get_key_hash(data: bytes):
+def get_key_hash(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
-def create_signature(data: bytes, priv_key: bytes):
+def create_signature(data: bytes, priv_key: bytes) -> str:
     h = SHA256.new(data)
     key = RSA.importKey(priv_key)
     signer = pkcs1_15.new(key).sign(h)
-    signature = base64.b64encode(signer)
+    signature = base64.b64encode(signer).decode('utf-8')
     return signature
 
 def verify_signature(data: bytes, signature: bytes, pub_key: bytes):
@@ -80,10 +80,10 @@ def verify_signature(data: bytes, signature: bytes, pub_key: bytes):
     except (ValueError, TypeError):
         print("验证失败,签名无效")
 
-def get_random_number():
-    return get_random_bytes(16)
+def get_random_number() -> str:
+    return get_random_bytes(16).decode('utf-8')
 
-def create_session_key(a: bytes, b: bytes, c: bytes):
+def create_session_key(a: str, b: str, c: str):
     return a + b + c
 
 def verify_certificate(certificate) -> bool:
