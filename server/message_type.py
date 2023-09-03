@@ -11,20 +11,20 @@ phone_code_storage = {}
 
 #注册
 def register(username, password, email, phone):
-    print("我进来了")
+    #print("我进来了")
     sql_response = create_user(username, password, email, phone)
-    print("我出来了")
+    #print("我出来了")
     if sql_response == 0:
-        print('用户已存在')
+        #print('用户已存在')
         return 0    #用户名已存在
         #返回注册界面
     elif sql_response == 1:
-        print('邮箱已存在')
+        #print('邮箱已存在')
         return 1 #邮箱已存在
         #返回注册界面
     else:#注册成功
         #make_folder(SERVER_PATH, username)#在指定目录创建用户文件夹
-        print('注册成功')
+        #print('注册成功')
         return 2
         #返回使用界面
 

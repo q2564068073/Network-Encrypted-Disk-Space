@@ -56,7 +56,7 @@ def login_check_password(username,password):
     cursor = conn.cursor()
     
     #检查用户名存在情况
-    cursor.execute("SELECT * FROM users WHERE username=?",(username,))
+    cursor.execute("SELECT * FROM users WHERE username=%s",(username,))
     user = cursor.fetchone() #这里的user是一个完整的查询结果，(username,password,...)
     if user is None:
         #用户名是不存在的，要提醒一下没有这个人

@@ -25,10 +25,10 @@ def client_handle(client_socket, client_address):
                     password = message_parts[2]
                     email = message_parts[3]
                     phone = message_parts[4]
-                    print(username,password,email,phone)
+                    #print(username,password,email,phone)
                     message_return = register(username,password,email,phone)
-                    print(message_return)
-                    #send_back(client_socket,message_return)
+                    #print(message_return)
+                    send_back(client_socket,message_return)
                 elif message_type == 'login_password':
                     username = message_parts[1]
                     password = password[2]
