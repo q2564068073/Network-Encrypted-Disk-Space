@@ -6,7 +6,12 @@ class PersonalInfoWindow:
   def __init__(self, username):
     self.window = Tk()
     self.window.title("个人主页")
-    self.window.geometry("800x600")
+    # 获取屏幕的宽度和高度
+    screen_width = self.window.winfo_screenwidth()
+    screen_height = self.window.winfo_screenheight()
+
+    # 设置窗口的大小为屏幕的大小
+    self.window.geometry(f"{screen_width}x{screen_height}")
 
     # 创建菜单栏
     self.menu_bar = Menu(self.window, font=("Arial", 14))

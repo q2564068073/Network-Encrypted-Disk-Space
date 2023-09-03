@@ -19,7 +19,7 @@ except :
 def login():
   login_window = Toplevel(window)
   login_window.title("登录")
-  login_window.geometry("500x500")
+  login_window.geometry("400x400+420+0")
 
   login_method = login_method_variable.get()
   # 用户名登录
@@ -98,7 +98,7 @@ def login():
 def register():
   register_window = Toplevel(window)
   register_window.title("注册")
-  register_window.geometry("400x400")
+  register_window.geometry("400x400+840+0")
 
   # 创建四个StringVar变量
   username = StringVar()
@@ -140,7 +140,7 @@ def register():
 def forgot_password():
   forgot_password_window = Toplevel(window)
   forgot_password_window.title("忘记密码")
-  forgot_password_window.geometry("400x400")
+  forgot_password_window.geometry("400x400+840+0")
 
   phone_number = StringVar()
   phone_code = StringVar()
@@ -204,7 +204,7 @@ def receive_message(client):
 window = Tk()
 window.title("登录注册系统")
 # 设置窗口大小和位置
-window.geometry("400x400")
+window.geometry("400x400+0+0")
 window.resizable(False, False)
 
 # 创建登录方式选择框
