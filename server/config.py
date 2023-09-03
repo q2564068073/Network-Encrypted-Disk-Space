@@ -1,7 +1,7 @@
 #服务器基本信息
 SERVER_IP = '127.0.0.1'
 SERVER_DB  = {
-    'host': SERVER_IP,
+    'host': '127.0.0.1',
     'user': 'root',
     'password' : '123456',
     'database' : 'yunpan'   
