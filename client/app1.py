@@ -4,6 +4,8 @@ from register import Registration
 from login_by_username import LoginName
 from login_by_email import LoginEmail
 from forget_password import ForgetPassword
+from personal_info_window import PersonalInfoWindow
+
 from config import *
 
 import socket
@@ -40,9 +42,12 @@ def login():
       client.send(message.encode())
       print (message)
       # flag = loginname.get_message(username.get(),password.get())
-      flag = ''
+      # flag表示服务器关于用户名登录检测返回的结果，用client.receive接收
+      flag = True
       if flag:
         messagebox.showinfo('用户名登陆成功！')
+        # 登陆成功，进入个人主页
+        PersonalInfoWindow(username)
       else:
         messagebox.showinfo('用户名登陆失败！')
 
@@ -59,7 +64,17 @@ def login():
     Label(login_window, text="验证码：", font=("Arial", 14)).pack()
     Entry(login_window, font=("Arial", 14), textvariable=email_code).pack()
 
-    Button(login_window, text="获取验证码", font=("Arial", 14)).pack()
+    # 需要监听获取点击获取邮箱验证码的事件信息并传输
+    def get_email_verification_code():
+      message = '给我发邮箱验证码。。。'
+      # client.send(message)
+      # 反馈信息
+      flag = 1
+      if flag:
+        messagebox.showinfo('验证码已经发送。。。')
+      else:
+        messagebox.showerror('验证码发送失败。。。')
+    Button(login_window, text="获取验证码", font=("Arial", 14),command=get_email_verification_code).pack()
 
     def login_by_email():
       loginemail = LoginEmail()
@@ -67,9 +82,11 @@ def login():
       message = loginemail.get_message(email.get(), email_code.get())
       client.send(message.encode())
       print(message)
-      flag = ''
+      flag = 1
       if flag:
+        # 登陆成功，进入个人主页
         messagebox.showinfo('邮箱登陆成功！')
+        PersonalInfoWindow(username)
       else:
         messagebox.showinfo('邮箱登陆失败！')
 
@@ -106,9 +123,11 @@ def register():
     message = registration.get_message(username.get(), password.get(), email.get(), phone_number.get())
     client.send(message.encode())
     print(message)
-    flag = ''
+    # 表示服务器关于注册返回的信息
+    flag = 1
     if flag:
-      messagebox.showinfo("注册成功", "注册成功！")
+      messagebox.showinfo("注册成功")
+      PersonalInfoWindow(username)
     else:
       messagebox.showerror("注册失败", "用户名已被占用，请尝试其他用户名！")
 
@@ -131,7 +150,17 @@ def forgot_password():
   Label(forgot_password_window, text="验证码：", font=("Arial", 14)).pack()
   Entry(forgot_password_window, font=("Arial", 14),textvariable=phone_code).pack()
 
-  Button(forgot_password_window, text="获取验证码", font=("Arial", 14)).pack()
+  # 需要监听获取点击获取手机验证码的事件信息并传输
+  def get_phone_verification_code():
+    message = '给我发手机验证码。。。'
+    # client.send(message)
+    # 反馈信息
+    flag = 1
+    if flag:
+      messagebox.showinfo('验证码已经发送。。。')
+    else:
+      messagebox.showerror('验证码发送失败。。。')
+  Button(forgot_password_window, text="获取验证码", font=("Arial", 14),command=get_phone_verification_code).pack()
 
   Label(forgot_password_window, text="新密码：", font=("Arial", 14)).pack()
   Entry(forgot_password_window, show="*", font=("Arial", 14),textvariable=new_password1).pack()
@@ -144,6 +173,7 @@ def forgot_password():
     message = forgetpassword.get_message(phone_number.get(),phone_code.get(),new_password1.get(),new_password2.get())
     client.send(message.encode())
     print(message)
+    # 服务器反馈的关于修改密码的信息
     flag = ''
     if flag:
       messagebox.showinfo('修改密码成功！')
