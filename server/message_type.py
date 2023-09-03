@@ -25,10 +25,13 @@ def register(username, password, email, phone):
         #print('邮箱已存在')
         return 1 #邮箱已存在
         #返回注册界面
+    elif sql_response==2:
+        print('电话号码已存在')
+        return 2
     else:#注册成功
         #make_folder(SERVER_PATH, username)#在指定目录创建用户文件夹
         #print('注册成功')
-        return 2
+        return
         #返回使用界面
 
 #用户密码登录
