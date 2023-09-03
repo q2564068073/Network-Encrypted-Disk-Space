@@ -115,3 +115,17 @@ class GetPhoneVerificationCode:
     """
     message = "get_phone_code|" + phone_number
     return message
+
+class Upload:
+  def upload_message(self, username,filename,data,key_hash,data_hash,path):
+    with open(path, 'r') as file:
+        # 读取文件内容并存储到变量中
+        message = 'upload'+'|'+username+'|'+filename+'|'+data+'|'+key_hash+'|'+data_hash+'|'+file.read()
+    return message
+
+  def download_message(self,username,filename,key_hash):
+    
+    message = 'download'+'|'+username+'|'+filename+'|'+key_hash
+    return message
+  
+  

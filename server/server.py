@@ -64,7 +64,7 @@ def client_handle(client_socket, client_address):
                 elif message_type == 'download':
                     username = message_parts[1]
                     filename = message_parts[2]
-                    
+                    key_hash = message_parts[3]
                     message_return = send_file(username, filename)
                     
         except:
