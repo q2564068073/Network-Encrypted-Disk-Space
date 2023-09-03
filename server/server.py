@@ -54,6 +54,18 @@ def client_handle(client_socket, client_address):
                     new_password = message_parts[4]
                     message_return = change_password(phone,auth_code,old_password,new_password) 
                     #send_back(client_socket,message_return)
+                elif message_type == 'upload':
+                    username = message_parts[1]
+                    filename = message_parts[2]
+                    data = message_parts[3]
+                    key_hash = message_parts[4]
+                    data_hash = message_parts[5]
+                    message_return = save_file(username, filename, data)
+                elif message_type == 'download':
+                    username = message_parts[1]
+                    filename = message_parts[2]
+                    
+                    message_return = send_file(username, filename)
                     
         except:
             # 处理异常，例如客户端断开连接

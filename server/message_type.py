@@ -212,4 +212,26 @@ def send_phone(phone, auth_code):
 
 
 def make_folder(path, folder_name):
-    os.mkdir(path + './'+folder_name)
+    os.mkdir(path + folder_name)
+
+def save_file(username, filename, data):
+    try:
+        if not os.path.isdir(f'../file/{username}'):
+            make_folder('../file', username)
+        else:
+            with open(f'../file/{username}/{filename}', 'wb') as f:
+                f.write(data)
+            return True
+    except Exception:
+        return False
+
+def send_file(username, filename, key_hash):
+    try:
+        # 查数据库校验hash
+        
+        with open(f'../file/{username}/{filename}', 'rb') as f:
+            data = f.read()
+            pass
+        return True
+    except Exception:
+        return False
