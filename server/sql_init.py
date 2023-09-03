@@ -2,40 +2,57 @@
 定义数据库操作的各种函数
 """
 
-from pymysql import *
+import pymysql
 from pprint import pprint
-import config
-
+from config import *
 #用户注册的功能，检查用户是否已经存在了，如果用户不存在的话那就注册
 #用户名已存在返回0 邮箱已经存在返回1 注册成功返回2
 def create_user(username,password,email,phone):
-    conn = connect(config.SERVER_DB)
-    cursor = conn.cursor()
-    
-    #检查用户名是否已经存在了 如果已经存在直接return 0
-    cursor.execute("SELECT * FROM users WHERE username=?",(username,))
-    if cursor.fetchone() is not None:
-        #用户名已存在
-        conn.close()
-        return 0  
-    
-    #检查邮箱是不是已经存在了 如果存在也不允许注册
-    cursor.execute("SELECT * FROM users WHERE email=?",(email,))
-    if cursor.fetchone() is not None:
-        conn.close()
-        return 1
-    
-    #插入新用户信息
-    cursor.execute("INSERT INTO users (username,password,email,phone) VALUES (?,?,?,?)",(username,password,email,phone))
-    conn.commit()
-    
-    #注册成功
-    conn.close()
-    return 2
+    conn = pymysql.connect(
+    host=SERVER_DB['host'],
+    user=SERVER_DB['user'],
+    password=SERVER_DB['password'],
+    database=SERVER_DB['database'],
+    charset=SERVER_DB['charset']
+    )
+    print("连接可以了")
+    try:
+        cursor = conn.cursor()
+        #检查用户名是否已经存在了 如果已经存在直接return 0
+        cursor.execute("SELECT * FROM users WHERE username=%s",(username,))
+        if cursor.fetchone() is not None:
+            #用户名已存在
+            conn.close()
+            return 0  
+        
+        #检查邮箱是不是已经存在了 如果存在也不允许注册
+        cursor.execute("SELECT * FROM users WHERE email=%s",(email,))
+        if cursor.fetchone() is not None:
+            conn.close()
+            return 1
+        
+        #插入新用户信息
+        cursor.execute("INSERT INTO users (username,password,email,phone) VALUES (%s,%s,%s,%s)",(username,password,email,phone))
+        conn.commit()
+        #注册成功
+        return 2
+    except Exception as e:
+        # 发生异常时记录错误日志或返回错误信息
+        print("Error:", e)
+        return -1
+    #finally:
+        # 关闭数据库连接
+        #conn.close()
 
 #登录方式1：通过用户密码登录
 def login_check_password(username,password):
-    conn = connect(config.SERVER_DB)
+    conn = pymysql.connect(
+    host=SERVER_DB['host'],
+    user=SERVER_DB['user'],
+    password=SERVER_DB['password'],
+    database=SERVER_DB['database'],
+    charset=SERVER_DB['charset']
+    )
     cursor = conn.cursor()
     
     #检查用户名存在情况
@@ -58,7 +75,13 @@ def login_check_password(username,password):
 
 #登录方式2：通过邮箱和验证码登录
 def login_check_email(email):
-    conn = connect(config.SERVER_DB)
+    conn = pymysql.connect(
+    host=SERVER_DB['host'],
+    user=SERVER_DB['user'],
+    password=SERVER_DB['password'],
+    database=SERVER_DB['database'],
+    charset=SERVER_DB['charset']
+    )
     cursor = conn.cursor()
     
     #检查邮箱存在的情况
@@ -74,7 +97,13 @@ def login_check_email(email):
         
 #检查手机号是否存在于数据库里面
 def login_check_phone(phone):
-    conn = connect(config.SERVER_DB)
+    conn = pymysql.connect(
+    host=SERVER_DB['host'],
+    user=SERVER_DB['user'],
+    password=SERVER_DB['password'],
+    database=SERVER_DB['database'],
+    charset=SERVER_DB['charset']
+    )
     cursor = conn.cursor()
     
     cursor.execute("SELECT * FROM users WHERE phone=?",(phone,))
@@ -87,7 +116,13 @@ def login_check_phone(phone):
 
 #修改密码,用新密码覆盖原密码
 def change_my_password(phone,new_password):
-    conn = connect(config.SERVER_DB)
+    conn = pymysql.connect(
+    host=SERVER_DB['host'],
+    user=SERVER_DB['user'],
+    password=SERVER_DB['password'],
+    database=SERVER_DB['database'],
+    charset=SERVER_DB['charset']
+    )
     cursor = conn.cursor()
     
     update_query = "UPDATE your_table SET password = ? WHERE phone = ?"
