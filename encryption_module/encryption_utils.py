@@ -81,7 +81,7 @@ def verify_signature(data: bytes, signature: bytes, pub_key: bytes):
         print("验证失败,签名无效")
 
 def get_random_number():
-    return int(get_random_bytes(16))
+    return get_random_bytes(16)
 
 def create_session_key(a: bytes, b: bytes, c: bytes):
     return a + b + c
