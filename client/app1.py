@@ -15,7 +15,8 @@ except :
     print('服务器连接失败，请修改后重新运行!!')
     exit(0)
 
-
+#登录部分已经全部调试完毕，首先还是没有响应的框，记得补一下
+#问题：邮箱验证登录部分的验证码是   列表list形式！！！  和后端有关系，暂时没有解决！ 其余没问题了
 def login():
   login_window = Toplevel(window)
   login_window.title("登录")
@@ -94,7 +95,9 @@ def login():
 
     Button(login_window, text="登录", font=("Arial", 14), command=login_by_email).pack()
 
-
+#注册功能调试完毕
+#注册的结果好像还没有响应框（成功失败） 
+#邮箱和手机号格式检查部分需要改一下 还有响应框
 def register():
   register_window = Toplevel(window)
   register_window.title("注册")
@@ -123,10 +126,12 @@ def register():
   def register_user():
     registration = Registration()
     message = registration.get_message(username.get(), password.get(), email.get(), phone_number.get())
+    print(message)
     send_message(client, message)
     flag = receive_message(client)
-    print(flag)
-    if flag == 0:
+    #print("逆天")
+    print(flag)        #注册的结果应该有对应的框，此处好像没有看到
+    if flag == 0:          
       messagebox.showinfo("注册失败", "用户名已存在！")
     elif flag == 1:
       messagebox.showerror("注册失败", "邮箱已存在！")
@@ -137,6 +142,8 @@ def register():
   # 创建注册按钮，并在点击时调用register_user方法
   Button(register_window, text="注册", font=("Arial", 14), command=register_user).pack()
 
+#忘记密码部分需要注意一下返回值，在给手机发送完验证码之后可以修改密码
+#如果前后两次密码不一样，此处的FALSE返回值改一下
 def forgot_password():
   forgot_password_window = Toplevel(window)
   forgot_password_window.title("忘记密码")
