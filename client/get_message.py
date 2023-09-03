@@ -1,6 +1,3 @@
-#from users import Users
-#user = Users()
-
 import hashlib
 import re
 
@@ -52,6 +49,25 @@ class ForgetPassword:
       return False
     print(phone_code, phone_number, md1)
     message = "change_password|" + phone_number + "|" + phone_code + "|" + md1
+    return message
+
+class GetEmailVerificationCode:
+  def get_message(self,email):
+    """
+    获取邮箱验证码
+    :param email:
+    :return:
+    """
+    message = "get_email_code|" + email
+    return message
+class GetPhoneVerificationCode:
+  def get_message(self,phone_number):
+    """
+    获取手机验证码
+    :param phone_number:
+    :return:
+    """
+    message = "get_phone_code|" + phone_number
     return message
 
 def check_password(password):
