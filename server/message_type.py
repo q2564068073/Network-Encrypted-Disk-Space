@@ -129,7 +129,7 @@ def md5s(strs):
     m.update(strs.encode("utf8")) #进行加密
     return m.hexdigest()
 
-#给邮件发送验证码
+#给邮件发送验证码 暂未调试
 def send_email(email, email_message):
     smtp_server = 'smtp.qq.com'  # 你的邮件服务器地址
     smtp_port = 25  # 邮件服务器端口号
