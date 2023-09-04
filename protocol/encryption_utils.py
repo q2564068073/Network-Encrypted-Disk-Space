@@ -27,18 +27,31 @@ def rsa_decrypt(data: bytes, priv_key: bytes) -> str:
     data = cipher.decrypt(data, 0).decode('utf-8')
     return data
 
-def rc4_key_schedule(seed: bytes):
-    S = list(range(256))
-    T = [ord(seed[i % len(seed)]) for i in range(256)]
-
+def rc4_key_schedule(seed_key_str):
+    """
+    传入一个字符串类型的种子密钥
+    返回rc4的S盒
+    """
+    s_box = list(range(256))
     j = 0
+    seed_key_bytes = seed_key_str.encode()
+
+    seed_key = [int(byte) for byte in seed_key_bytes]
+
     for i in range(256):
-        j = (j + S[i] + T[i]) % 256
-        S[i], S[j] = S[j], S[i]
+        j = (j + s_box[i] + seed_key[i % len(seed_key)]) % 256
+        s_box[i], s_box[j] = s_box[j], s_box[i]
 
-    return S
+    return s_box
 
-def generate_rc4_keystream(S: list, data_length: int) -> str:
+
+def generate_rc4_keystream(S: list, data_length: int):
+    """
+    传入S盒和需加密的文件长度
+    返回生成的密钥流
+    之后按位异或
+    """
+
     i = 0
     j = 0
 
@@ -51,7 +64,35 @@ def generate_rc4_keystream(S: list, data_length: int) -> str:
         keystream_byte = S[t]
         keystream.append(keystream_byte)
 
-    return ''.join(keystream)
+    return bytes(keystream)
+
+"""
+rc4负责文件的加密和信道的加密
+"""
+
+def rc4_en_de_crypt(data: bytes, key: bytes):
+    result = bytes([a ^ b for a, b in zip(data, key)])
+    return result
+
+
+def rc4_file(file_path, seed_key:str):
+    """
+    给定要发送的文件路径以及加解密密码，返回加密后的文件字节流和加解密密码的hash值
+    """
+    # 文件转字节流
+    with open(file_path, 'rb') as file:
+        # 读取文件内容到字节流
+        file_byte_stream = file.read()
+    file_len = len(file_byte_stream)
+
+    key_hash=get_hash(seed_key.encode("utf-8"))
+
+
+    s_box = rc4_key_schedule(seed_key)
+    keystream = generate_rc4_keystream(s_box, file_len)
+    file_to_send = rc4_en_de_crypt(file_byte_stream, keystream)
+
+    return file_to_send,key_hash.encode("utf-8")
 
 def rc4_encrypt(data: bytes, key: bytes) -> str:
     cipher = ARC4.new(key)

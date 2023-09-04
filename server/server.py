@@ -25,39 +25,48 @@ def client_handle(client_socket, client_address):
                     password = message_parts[2]
                     email = message_parts[3]
                     phone = message_parts[4]
-                    #print(username,password,email,phone)
                     message_return = register(username,password,email,phone)
-                    #print(message_return)
-                    send_back(client_socket,message_return)
+                    send_back(client_socket,str(message_return))
                 elif message_type == 'login_password':
                     username = message_parts[1]
-                    password = password[2]
+                    password = message_parts[2]
+                    #print(username,password)
                     message_return = login_password(username,password)
-                    #send_back(client_socket,message_return)
+                    send_back(client_socket,str(message_return))
                 elif message_type == 'get_email_code':
                     email = message_parts[1]
                     message_return = get_email_code(email)
-                    #send_back(client_socket,message_return)
+                    send_back(client_socket,str(message_return))
                 elif message_type == 'login_email':
                     email = message_parts[1]
                     auth_code = message_parts[2]
                     message_return = login_email(email,auth_code)
-                    #send_back(client_socket,message_return)
+                    send_back(client_socket,str(message_return))
                 elif message_type == 'get_phone_code':
                     phone = message_parts[1]
                     message_return = get_phone_code(phone)
-                    #send_back(client_socket,message_return)
+                    send_back(client_socket,str(message_return))
                 elif message_type == 'change_password':
                     phone = message_parts[1]
                     auth_code = message_parts[2]
                     old_password = message_parts[3]
                     new_password = message_parts[4]
                     message_return = change_password(phone,auth_code,old_password,new_password) 
-                    #send_back(client_socket,message_return)
-                    
+                    send_back(client_socket,str(message_return))
+                elif message_type == 'upload':
+                    username = message_parts[1]
+                    filename = message_parts[2]
+                    data = message_parts[3]
+                    key_hash = message_parts[4]
+                    data_hash = message_parts[5]
+                    message_return = save_file(username, filename, data, key_hash, data_hash)
+                elif message_type == 'download':
+                    username = message_parts[1]
+                    filename = message_parts[2]
+                    key_hash = message_parts[3]
+                    message_return = send_file(username, filename, key_hash)      
         except:
-            # 处理异常，例如客户端断开连接
-            print(f"{client_address} 断开连接")
+            print(f"'{client_address}'断开连接")
             client_socket.close()
             break
         

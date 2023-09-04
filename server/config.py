@@ -1,10 +1,11 @@
 #服务器基本信息
 SERVER_IP = '127.0.0.1'
 SERVER_DB  = {
-    'host': '127.0.0.1',
+    'host': 'localhost',
     'user': 'root',
     'password' : '123456',
-    'database' : 'yunpan'   
+    'database' : 'javaweb',
+    'charset' : 'utf8',
 }
 SERVER_PORT = 9000
 SERVER_PATH = 'C:\\Users\\29923\\Desktop\\server\\Flies\\'
