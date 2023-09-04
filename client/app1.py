@@ -20,7 +20,7 @@ except :
 def login():
   login_window = Toplevel(window)
   login_window.title("登录")
-  login_window.geometry("500x500")
+  login_window.geometry("400x400+420+0")
 
   login_method = login_method_variable.get()
   # 用户名登录
@@ -34,20 +34,17 @@ def login():
     Entry(login_window, show="*", font=("Arial", 14),textvariable=password).pack()
 
     def login_by_username():
-      '''
       loginname = LoginName()
       message = loginname.get_message(username.get(),password.get())
       send_message(client, message)
       print(message)
       flag = receive_message(client)
       print(flag)
-      '''
-      flag = 2
-      if flag == 0:  # 用户名不存在
+      if flag == '0':  # 用户名不存在
         messagebox.showinfo("登录失败", "用户名不存在！")
-      elif flag == 1:  # 密码错误
+      elif flag == '1':  # 密码错误
         messagebox.showinfo("登录失败", "密码错误！")
-      elif flag == 2:  # 登录成功
+      elif flag == '2':  # 登录成功
         messagebox.showinfo("登录成功", "登录成功！")
         PersonalInfoWindow(username)
         # 弹出用户页面
@@ -99,12 +96,12 @@ def login():
     Button(login_window, text="登录", font=("Arial", 14), command=login_by_email).pack()
 
 #注册功能调试完毕
-#注册的结果好像还没有响应框（成功失败） 
+#注册的结果好像还没有响应框（成功失败）
 #邮箱和手机号格式检查部分需要改一下 还有响应框
 def register():
   register_window = Toplevel(window)
   register_window.title("注册")
-  register_window.geometry("400x400")
+  register_window.geometry("400x400+840+0")
 
   # 创建四个StringVar变量
   username = StringVar()
@@ -134,7 +131,7 @@ def register():
     flag = receive_message(client)
     #print("逆天")
     print(flag)        #注册的结果应该有对应的框，此处好像没有看到
-    if flag == 0:          
+    if flag == 0:
       messagebox.showinfo("注册失败", "用户名已存在！")
     elif flag == 1:
       messagebox.showerror("注册失败", "邮箱已存在！")
@@ -150,7 +147,7 @@ def register():
 def forgot_password():
   forgot_password_window = Toplevel(window)
   forgot_password_window.title("忘记密码")
-  forgot_password_window.geometry("400x400")
+  forgot_password_window.geometry("400x400+840+0")
 
   phone_number = StringVar()
   phone_code = StringVar()
@@ -214,7 +211,7 @@ def receive_message(client):
 window = Tk()
 window.title("登录注册系统")
 # 设置窗口大小和位置
-window.geometry("400x400")
+window.geometry("400x400+0+0")
 window.resizable(False, False)
 
 # 创建登录方式选择框
