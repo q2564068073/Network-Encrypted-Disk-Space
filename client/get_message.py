@@ -12,13 +12,13 @@ class Registration:
     '''
     k=check_password(password)
     if k == 2:   #2代表不符合要求
-      return False
+      return 1
     e=checkemail(email)             #此处注释默认已经完成检查，准许消息的组装
     if e==2:                        #False返回值需要被修改，encode方法不支持bool类型
-      return False
+      return 2
     p=chec_phone_number(phone_number)
     if p==2:
-      return False
+      return 3
     '''
     #对密码部分进行md5哈希（32位）
     md=hashlib.md5(password.encode('utf-8'))

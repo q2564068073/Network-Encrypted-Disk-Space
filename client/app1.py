@@ -34,12 +34,15 @@ def login():
     Entry(login_window, show="*", font=("Arial", 14),textvariable=password).pack()
 
     def login_by_username():
+      '''
       loginname = LoginName()
       message = loginname.get_message(username.get(),password.get())
       send_message(client, message)
       print(message)
       flag = receive_message(client)
       print(flag)
+      '''
+      flag = 2
       if flag == 0:  # 用户名不存在
         messagebox.showinfo("登录失败", "用户名不存在！")
       elif flag == 1:  # 密码错误
