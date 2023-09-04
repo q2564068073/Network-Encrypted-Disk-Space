@@ -40,11 +40,11 @@ def login():
       print(message)
       flag = receive_message(client)
       print(flag)
-      if flag == 0:  # 用户名不存在
+      if flag == '0':  # 用户名不存在
         messagebox.showinfo("登录失败", "用户名不存在！")
-      elif flag == 1:  # 密码错误
+      elif flag == '1':  # 密码错误
         messagebox.showinfo("登录失败", "密码错误！")
-      elif flag == 2:  # 登录成功
+      elif flag == '2':  # 登录成功
         messagebox.showinfo("登录成功", "登录成功！")
         PersonalInfoWindow(username)
         # 弹出用户页面
@@ -96,7 +96,7 @@ def login():
     Button(login_window, text="登录", font=("Arial", 14), command=login_by_email).pack()
 
 #注册功能调试完毕
-#注册的结果好像还没有响应框（成功失败） 
+#注册的结果好像还没有响应框（成功失败）
 #邮箱和手机号格式检查部分需要改一下 还有响应框
 def register():
   register_window = Toplevel(window)
@@ -131,7 +131,7 @@ def register():
     flag = receive_message(client)
     #print("逆天")
     print(flag)        #注册的结果应该有对应的框，此处好像没有看到
-    if flag == 0:          
+    if flag == 0:
       messagebox.showinfo("注册失败", "用户名已存在！")
     elif flag == 1:
       messagebox.showerror("注册失败", "邮箱已存在！")
