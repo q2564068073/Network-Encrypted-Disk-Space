@@ -20,7 +20,7 @@ except :
 def login():
   login_window = Toplevel(window)
   login_window.title("登录")
-  login_window.geometry("500x500")
+  login_window.geometry("400x400+420+0")
 
   login_method = login_method_variable.get()
   # 用户名登录
@@ -41,9 +41,9 @@ def login():
       flag = receive_message(client)
       print(flag)
       if flag == '0':  # 用户名不存在
-        messagebox.showinfo("登录失败", "用户名不存在！")
+        messagebox.showerror("登录失败", "用户名不存在！")
       elif flag == '1':  # 密码错误
-        messagebox.showinfo("登录失败", "密码错误！")
+        messagebox.showerror("登录失败", "密码错误！")
       elif flag == '2':  # 登录成功
         messagebox.showinfo("登录成功", "登录成功！")
         PersonalInfoWindow(username)
@@ -72,9 +72,9 @@ def login():
       print(flag)
       # 反馈信息
       if flag == 0:
-        messagebox.showinfo("发送失败", "邮箱不存在！")
+        messagebox.showerror("发送失败", "邮箱不存在！")
       elif flag == 1:
-        messagebox.showerror("发送成功", "验证码已发送！")
+        messagebox.showinfo("发送成功", "验证码已发送！")
     Button(login_window, text="获取验证码", font=("Arial", 14),command=get_email_verification_code).pack()
 
     def login_by_email():
@@ -84,11 +84,11 @@ def login():
       send_message(client, message)
       flag = receive_message(client)
       print(flag)
-      if flag == 0:
-        messagebox.showinfo("登录失败", "邮箱错误！")
-      elif flag == 1:
-        messagebox.showinfo("登录失败", "验证码错误！")
-      elif flag == 2:
+      if flag == '0':
+        messagebox.showerror("登录失败", "邮箱错误！")
+      elif flag == '1':
+        messagebox.showishowerrornfo("登录失败", "验证码错误！")
+      elif flag == '2':
         messagebox.showinfo("登录成功", "登录成功！")
         PersonalInfoWindow(username)
         # 跳转使用界面
@@ -101,7 +101,7 @@ def login():
 def register():
   register_window = Toplevel(window)
   register_window.title("注册")
-  register_window.geometry("400x400")
+  register_window.geometry("400x400+840+0")
 
   # 创建四个StringVar变量
   username = StringVar()
@@ -127,18 +127,21 @@ def register():
     registration = Registration()
     message = registration.get_message(username.get(), password.get(), email.get(), phone_number.get())
     print(message)
-    send_message(client, message)
-    flag = receive_message(client)
-    #print("逆天")
-    print(flag)        #注册的结果应该有对应的框，此处好像没有看到
-    if flag == 0:
-      messagebox.showinfo("注册失败", "用户名已存在！")
-    elif flag == 1:
-      messagebox.showerror("注册失败", "邮箱已存在！")
-    elif flag == 2:
-      messagebox.showerror("注册成功", "注册成功！")
-      PersonalInfoWindow(username)
-      # 跳转使用界面
+    if message == "格式错误":
+      messagebox.showerror("格式错误","请输入正确的信息")
+    else:
+      send_message(client, message)
+      flag = receive_message(client)
+      #print("逆天")
+      print(flag)        #注册的结果应该有对应的框，此处好像没有看到
+      if flag == '0':
+        messagebox.showerror("注册失败", "用户名已存在！")
+      elif flag == '1':
+        messagebox.showerror("注册失败", "邮箱已存在！")
+      elif flag == '2':
+        messagebox.showinfo("注册成功", "注册成功！")
+        PersonalInfoWindow(username)     
+        # 跳转使用界面
   # 创建注册按钮，并在点击时调用register_user方法
   Button(register_window, text="注册", font=("Arial", 14), command=register_user).pack()
 
@@ -147,7 +150,7 @@ def register():
 def forgot_password():
   forgot_password_window = Toplevel(window)
   forgot_password_window.title("忘记密码")
-  forgot_password_window.geometry("400x400")
+  forgot_password_window.geometry("400x400+840+0")
 
   phone_number = StringVar()
   phone_code = StringVar()
@@ -168,10 +171,10 @@ def forgot_password():
     flag = receive_message(client)
     print(flag)
     # 反馈信息
-    if flag == 0:
-      messagebox.showinfo("发送失败", "手机号不存在！")
-    elif flag == 1:
-      messagebox.showerror("发送成功", "验证码已发送！")
+    if flag == '0':
+      messagebox.showerror("发送失败", "手机号不存在！")
+    elif flag == '1':
+      messagebox.showinfo("发送成功", "验证码已发送！")
   Button(forgot_password_window, text="获取验证码", font=("Arial", 14),command=get_phone_verification_code).pack()
 
   Label(forgot_password_window, text="新密码：", font=("Arial", 14)).pack()
@@ -188,11 +191,11 @@ def forgot_password():
     flag = receive_message(client)
     print(flag)
     if flag == 0:
-      messagebox.showinfo("修改失败", "验证码不正确！")
+      messagebox.showerror("修改失败", "验证码不正确！")
     elif flag == 1:
       messagebox.showerror("修改失败", "两次密码不一致！")
     elif flag == 2:
-      messagebox.showerror("修改成功", "修改成功！")
+      messagebox.showinfo("修改成功", "修改成功！")
   Button(forgot_password_window, text="确认修改", font=("Arial", 14),command=forget_password).pack()
 
 #发送消息
@@ -211,7 +214,7 @@ def receive_message(client):
 window = Tk()
 window.title("登录注册系统")
 # 设置窗口大小和位置
-window.geometry("400x400")
+window.geometry("400x400+0+0")
 window.resizable(False, False)
 
 # 创建登录方式选择框

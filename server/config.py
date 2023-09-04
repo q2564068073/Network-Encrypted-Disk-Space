@@ -14,3 +14,9 @@ SERVER_PATH = 'C:\\Users\\29923\\Desktop\\server\\Flies\\'
 SMS_API = "http://api.smsbao.com/"
 SMS_USER = 'YanYu2003'
 SMS_PASSWORD = 'yyyy12345'
+
+#邮箱验证码发送基本配置
+SMTP_SERVER = 'smtp.qq.com'
+SMTP_PORT = 25
+SENDER_EMAIL = '498618798@qq.com'
+SENDER_PASSWORD = 'ueaoenpgwgdgbjcg'

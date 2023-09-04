@@ -9,23 +9,19 @@ class Registration:
   #此处组装信息之前对密码复杂度和邮箱以及手机号进行格式检查，如果不符合要求那么会弹出一个框框
   #该部分在前端完成，如果都符合条件则对各个关键字进行消息组装
   def get_message(self, username, password,email,phone_number):
-    '''
-    k=check_password(password)
-    if k == 2:   #2代表不符合要求
-      return False
-    e=checkemail(email)             #此处注释默认已经完成检查，准许消息的组装
-    if e==2:                        #False返回值需要被修改，encode方法不支持bool类型
-      return False
-    p=chec_phone_number(phone_number)
-    if p==2:
-      return False
-    '''
-    #对密码部分进行md5哈希（32位）
-    md=hashlib.md5(password.encode('utf-8'))
-    md=md.hexdigest()
-    print(username,md,email,phone_number)
-    message = "register|" + username + "|" + md + "|" + email + "|" + phone_number
-    return message
+
+    e = check_email(email)             
+    p = check_phone_number(phone_number)
+    if e==2 or p == 2:                        
+      return "格式错误"
+    else:
+      #对密码部分进行md5哈希（32位）
+      md=hashlib.md5(password.encode('utf-8'))
+      md=md.hexdigest()
+      print(username,md,email,phone_number)
+      message = "register|" + username + "|" + md + "|" + email + "|" + phone_number
+      print(message)
+      return message
 
 class LoginName:
   def __init__(self):
@@ -86,24 +82,21 @@ def check_password(password):
   return k
 
 #检查邮箱格式是否符合要求，如果符合要求返回1，不符合要求返回2
-def checkemail(address):
-  """
-  利用正则表达式检测邮箱格式
-  """
-  regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
-  if re.fullmatch(regex, address):
-    t = 1
-  else:
-    t = 2
-  return t
+def check_email(email):
+      # 邮件格式检查
+    pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+    if re.match(pattern, email):
+      return True
+    else:
+      return False
 
-def chec_phone_number(phone_number):
-  result = re.compile(r'^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$')
-  if re.fullmatch(result, phone_number):
-    k=1
-  else:
-    k=2
-  return k
+def check_phone_number(phone_number):
+    # 手机号码格式检查
+    pattern = r'^1\d{10}$'  # 以1开头，后面跟着10位数字
+    if re.match(pattern, phone_number):
+      return True
+    else:
+      return False
 
 class GetEmailVerificationCode:
   def get_message(self,email):
