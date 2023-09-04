@@ -8,6 +8,7 @@ import base64
 import time
 import socket
 from sql_init import *
+from protocol.communication import *
 
 email_code_storage = {}
 phone_code_storage = {}
@@ -239,7 +240,7 @@ def add_user_to_shared_space(username, space_name):
 def make_folder(path, folder_name):
     os.mkdir(path + folder_name)
 
-def save_file(username, filename, data):
+def save_file(username, filename, data, key_hash, data_hash):
     try:
         if not os.path.isdir(f'../file/{username}'):
             make_folder('../file', username)
@@ -250,13 +251,14 @@ def save_file(username, filename, data):
     except Exception:
         return False
 
-def send_file(username, filename, key_hash):
+def send_file(username, filename, key_hash, client_socket):
     try:
         # 查数据库校验hash
-        
+        pass
         with open(f'../file/{username}/{filename}', 'rb') as f:
             data = f.read()
-            pass
+            es = EncryptedSocket(client_socket)
+            es.send_encrypt(data)
         return True
     except Exception:
         return False

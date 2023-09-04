@@ -1,6 +1,9 @@
+import socket
+from server.config import *
 from tkinter import *
 from tkinter import messagebox
 from tkinter import filedialog
+from protocol.communication import *
 
 class PersonalInfoWindow:
   def __init__(self, username):
@@ -84,7 +87,12 @@ class PersonalInfoWindow:
     selected_file = self.file_list.get(self.file_list.curselection())
     if selected_file:
       # 处理文件下载逻辑
-      #
+      sk = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      sk.connect((SERVER_IP, SERVER_PORT))
+      es = EncryptedSocket(sk)
+      text = es.recv_decrypt()
+      with open(f'C:\\Users\\{selected_file}', 'wb') as f:
+        f.write(text)
       messagebox.showinfo("下载文件", "文件下载成功！")
 
   def show_shared_files(self):
