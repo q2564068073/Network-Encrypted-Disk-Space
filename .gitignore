@@ -17,3 +17,4 @@ client/__pycache__/personal_info_window.cpython-310.pyc
 server/__pycache__/message_type.cpython-310.pyc
 client/_pycache
 server/_pycache
+*.pyc
