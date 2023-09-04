@@ -52,7 +52,19 @@ def client_handle(client_socket, client_address):
                     old_password = message_parts[3]
                     new_password = message_parts[4]
                     message_return = change_password(phone,auth_code,old_password,new_password) 
-                    send_back(client_socket,str(message_return))      
+                    send_back(client_socket,str(message_return))
+                elif message_type == 'upload':
+                    username = message_parts[1]
+                    filename = message_parts[2]
+                    data = message_parts[3]
+                    key_hash = message_parts[4]
+                    data_hash = message_parts[5]
+                    message_return = save_file(username, filename, data, key_hash, data_hash)
+                elif message_type == 'download':
+                    username = message_parts[1]
+                    filename = message_parts[2]
+                    key_hash = message_parts[3]
+                    message_return = send_file(username, filename, key_hash)      
         except:
             print(f"'{client_address}'断开连接")
             client_socket.close()
