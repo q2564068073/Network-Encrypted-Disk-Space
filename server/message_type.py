@@ -25,10 +25,13 @@ def register(username, password, email, phone):
         #print('邮箱已存在')
         return 1 #邮箱已存在
         #返回注册界面
+    elif sql_response==2:
+        print('电话号码已存在')
+        return 2
     else:#注册成功
         #make_folder(SERVER_PATH, username)#在指定目录创建用户文件夹
         #print('注册成功')
-        return 2
+        return
         #返回使用界面
 
 #用户密码登录
@@ -211,5 +214,43 @@ def send_phone(phone, auth_code):
     urllib.request.urlopen(send_url)  # 发送请求
 
 
+# 存储共享空间的字典，每个共享空间包含成员和文件
+shared_spaces = {}
+def create_shared_space(username,space_name):
+    shared_spaces[space_name] = {'members': set(), 'files': {}}
+    add_user_to_shared_space(username,space_name)
+    return f"共享空间 '{space_name}' 创建成功"
+
+def add_user_to_shared_space(username, space_name):
+    k=check_username(username)
+    if k==1 and space_name in shared_spaces:
+        shared_spaces[space_name]['members'].add(username)
+        return f"用户 '{username}' 已加入共享空间 '{space_name}'"
+    else:
+        return "用户或共享空间不存在"
+
+
 def make_folder(path, folder_name):
-    os.mkdir(path + './'+folder_name)
+    os.mkdir(path + folder_name)
+
+def save_file(username, filename, data):
+    try:
+        if not os.path.isdir(f'../file/{username}'):
+            make_folder('../file', username)
+        else:
+            with open(f'../file/{username}/{filename}', 'wb') as f:
+                f.write(data)
+            return True
+    except Exception:
+        return False
+
+def send_file(username, filename, key_hash):
+    try:
+        # 查数据库校验hash
+        
+        with open(f'../file/{username}/{filename}', 'rb') as f:
+            data = f.read()
+            pass
+        return True
+    except Exception:
+        return False
