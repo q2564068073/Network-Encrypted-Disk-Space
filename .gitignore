@@ -1,8 +1,6 @@
 # Default ignored files
 /shelf/
 /workspace.xml
-/client/_pycache
-/server/_pycache
 # Editor-based HTTP Client requests
 /httpRequests/
 # Datasource local storage ignored files
@@ -10,3 +8,12 @@
 /dataSources.local.xml
 
 
+server/__pycache__/sql_init.cpython-310.pyc
+server/__pycache__/message_type.cpython-310.pyc
+server/__pycache__/config.cpython-310.pyc
+client/__pycache__/get_message.cpython-310.pyc
+client/__pycache__/config.cpython-310.pyc
+client/__pycache__/personal_info_window.cpython-310.pyc
+server/__pycache__/message_type.cpython-310.pyc
+client/_pycache
+server/_pycache
