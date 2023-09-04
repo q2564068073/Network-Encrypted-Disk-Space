@@ -71,9 +71,9 @@ def login():
       flag = receive_message(client)
       print(flag)
       # 反馈信息
-      if flag == 0:
+      if flag == '0':
         messagebox.showerror("发送失败", "邮箱不存在！")
-      elif flag == 1:
+      elif flag == '1':
         messagebox.showinfo("发送成功", "验证码已发送！")
     Button(login_window, text="获取验证码", font=("Arial", 14),command=get_email_verification_code).pack()
 
@@ -190,11 +190,11 @@ def forgot_password():
     print(message)
     flag = receive_message(client)
     print(flag)
-    if flag == 0:
+    if flag == '0':
       messagebox.showerror("修改失败", "验证码不正确！")
-    elif flag == 1:
+    elif flag == '1':
       messagebox.showerror("修改失败", "两次密码不一致！")
-    elif flag == 2:
+    elif flag == '2':
       messagebox.showinfo("修改成功", "修改成功！")
   Button(forgot_password_window, text="确认修改", font=("Arial", 14),command=forget_password).pack()
 
@@ -216,6 +216,8 @@ window.title("登录注册系统")
 # 设置窗口大小和位置
 window.geometry("400x400+0+0")
 window.resizable(False, False)
+
+
 
 # 创建登录方式选择框
 login_method_label = Label(window, text="登录方式:", font=("Arial", 12))

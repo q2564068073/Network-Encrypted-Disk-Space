@@ -12,7 +12,7 @@ class Registration:
 
     e = check_email(email)             
     p = check_phone_number(phone_number)
-    if e==2 or p == 2:                        
+    if e == False or p == False:                        
       return "格式错误"
     else:
       #对密码部分进行md5哈希（32位）
