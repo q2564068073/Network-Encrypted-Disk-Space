@@ -164,7 +164,7 @@ def insert_file(username,filename,hash_value):
     )
     try:
         cursor = conn.cursor()
-        # 检查用户名是否已经存在了 如果已经存在直接return 0
+        # 检查文件名是否已经存在了 如果已经存在直接return 0
         cursor.execute("SELECT * FROM files WHERE username=%s and filename=%s", (username,filename))
         if cursor.fetchone() is not None:
             # 该文件已存在
@@ -240,3 +240,4 @@ def find (username):
         return -1
     finally:
         conn.close()
+
