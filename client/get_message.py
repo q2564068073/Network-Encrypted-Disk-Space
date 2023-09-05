@@ -118,14 +118,16 @@ class GetPhoneVerificationCode:
     return message
 
 class Upload:
-  def upload_message(self, username,filename,data,key_hash,data_hash,path):
-    with open(path, 'r') as file:
-        # 读取文件内容并存储到变量中
-        message = 'upload'+'|'+username+'|'+filename+'|'+data+'|'+key_hash+'|'+data_hash+'|'+file.read()
+  def upload_message(self, username,filename,data,key_hash):
+    message = 'upload'+'|'+username+'|'+filename+'|'+data+'|'+key_hash
     return message
 
   def download_message(self,username,filename,key_hash):
     
     message = 'download'+'|'+username+'|'+filename+'|'+key_hash
+    return message
+
+  def get_list_message(self,username):
+    message = 'get_list' + '|' + username
     return message
   
