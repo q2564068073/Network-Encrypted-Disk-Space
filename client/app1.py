@@ -23,7 +23,7 @@ except :
 def login():
   login_window = Toplevel(window)
   login_window.title("登录")
-  login_window.geometry("500x500")
+  login_window.geometry("400x400+420+0")
 
   login_method = login_method_variable.get()
   # 用户名登录
@@ -44,15 +44,15 @@ def login():
       flag = receive_message(safe_socket)
       print(flag)
       if flag == '0':  # 用户名不存在
-        messagebox.showinfo("登录失败", "用户名不存在！")
+        messagebox.showerror("登录失败", "用户名不存在！")
       elif flag == '1':  # 密码错误
-        messagebox.showinfo("登录失败", "密码错误！")
+        messagebox.showerror("登录失败", "密码错误！")
       elif flag == '2':  # 登录成功
         messagebox.showinfo("登录成功", "登录成功！")
         PersonalInfoWindow(username.get(),safe_socket)
         # 弹出用户页面
 
-    Button(login_window, text="登录", font=("Arial", 14),command=login_by_username).pack()
+    Button(login_window, text="登录", font=("Arial", 14),command=login_by_username,bg='lightblue',fg='white').pack()
 
   # 邮箱登录
   elif login_method == "email_code":
@@ -75,10 +75,10 @@ def login():
       print(flag)
       # 反馈信息
       if flag == '0':
-        messagebox.showinfo("发送失败", "邮箱不存在！")
+        messagebox.showerror("发送失败", "邮箱不存在！")
       elif flag == '1':
-        messagebox.showerror("发送成功", "验证码已发送！")
-    Button(login_window, text="获取验证码", font=("Arial", 14),command=get_email_verification_code).pack()
+        messagebox.showinfo("发送成功", "验证码已发送！")
+    Button(login_window, text="获取验证码", font=("Arial", 14),command=get_email_verification_code,bg='lightblue',fg='white').pack()
 
     def login_by_email():
       loginemail = LoginEmail()
@@ -88,16 +88,16 @@ def login():
       flag = receive_message(safe_socket)
       print(flag)
       if flag == '0':
-        messagebox.showinfo("登录失败", "邮箱错误！")
+        messagebox.showerror("登录失败", "邮箱错误！")
       elif flag == '1':
-        messagebox.showinfo("登录失败", "验证码错误！")
+        messagebox.showerror("登录失败", "验证码错误！")
       else:
         username = flag
         messagebox.showinfo("登录成功", "登录成功！")
         PersonalInfoWindow(username,safe_socket)
         # 跳转使用界面
 
-    Button(login_window, text="登录", font=("Arial", 14), command=login_by_email).pack()
+    Button(login_window, text="登录", font=("Arial", 14), command=login_by_email,bg='lightblue',fg='white').pack()
 
 #注册功能调试完毕
 #注册的结果好像还没有响应框（成功失败） 
@@ -105,7 +105,7 @@ def login():
 def register():
   register_window = Toplevel(window)
   register_window.title("注册")
-  register_window.geometry("400x400")
+  register_window.geometry("400x400+840+0")
 
   # 创建四个StringVar变量
   username = StringVar()
@@ -136,22 +136,22 @@ def register():
     #print("逆天")
     print(flag)        #注册的结果应该有对应的框，此处好像没有看到
     if flag == '0':          
-      messagebox.showinfo("注册失败", "用户名已存在！")
+      messagebox.showerror("注册失败", "用户名已存在！")
     elif flag == '1':
-      messagebox.showerror("注册失败", "邮箱已存在！")
+      messagebox.showinfo("注册失败", "邮箱已存在！")
     elif flag == '2':
-      messagebox.showerror("注册成功", "注册成功！")
+      messagebox.showinfo("注册成功", "注册成功！")
       PersonalInfoWindow(username.get(),safe_socket)
       # 跳转使用界面
   # 创建注册按钮，并在点击时调用register_user方法
-  Button(register_window, text="注册", font=("Arial", 14), command=register_user).pack()
+  Button(register_window, text="注册", font=("Arial", 14), command=register_user,bg='lightblue',fg='white').pack()
 
 #忘记密码部分需要注意一下返回值，在给手机发送完验证码之后可以修改密码
 #如果前后两次密码不一样，此处的FALSE返回值改一下
 def forgot_password():
   forgot_password_window = Toplevel(window)
   forgot_password_window.title("忘记密码")
-  forgot_password_window.geometry("400x400")
+  forgot_password_window.geometry("400x400+840+0")
 
   phone_number = StringVar()
   phone_code = StringVar()
@@ -173,10 +173,10 @@ def forgot_password():
     print(flag)
     # 反馈信息
     if flag == '0':
-      messagebox.showinfo("发送失败", "手机号不存在！")
+      messagebox.showerror("发送失败", "手机号不存在！")
     elif flag == '1':
-      messagebox.showerror("发送成功", "验证码已发送！")
-  Button(forgot_password_window, text="获取验证码", font=("Arial", 14),command=get_phone_verification_code).pack()
+      messagebox.showinfo("发送成功", "验证码已发送！")
+  Button(forgot_password_window, text="获取验证码", font=("Arial", 14),command=get_phone_verification_code,bg='lightblue',fg='white').pack()
 
   Label(forgot_password_window, text="新密码：", font=("Arial", 14)).pack()
   Entry(forgot_password_window, show="*", font=("Arial", 14),textvariable=new_password1).pack()
@@ -192,21 +192,21 @@ def forgot_password():
     flag = receive_message(safe_socket)
     print(flag)
     if flag == '0':
-      messagebox.showinfo("修改失败", "验证码不正确！")
+      messagebox.showerror("修改失败", "验证码不正确！")
     elif flag == '1':
       messagebox.showerror("修改失败", "两次密码不一致！")
     elif flag == '2':
-      messagebox.showerror("修改成功", "修改成功！")
-  Button(forgot_password_window, text="确认修改", font=("Arial", 14),command=forget_password).pack()
+      messagebox.showinfo("修改成功", "修改成功！")
+  Button(forgot_password_window, text="确认修改", font=("Arial", 14),command=forget_password,bg='lightblue',fg='white').pack()
 
 
 
 
 # 创建窗口
 window = Tk()
-window.title("登录注册系统")
+window.title("云端存储登录注册系统")
 # 设置窗口大小和位置
-window.geometry("400x400")
+window.geometry("400x400+0+0")
 window.resizable(False, False)
 
 # 创建登录方式选择框
@@ -222,14 +222,14 @@ email_code_radio = Radiobutton(window, text="邮箱+验证码", variable=login_m
 email_code_radio.pack()
 
 # 创建登录和注册按钮
-login_button = Button(window, text="登录", command=login, font=("Arial", 14), width=20)
+login_button = Button(window, text="登录", command=login, font=("Arial", 14), width=20,bg='lightblue',fg='white')
 login_button.pack(pady=10)
 
-register_button = Button(window, text="注册", command=register, font=("Arial", 14), width=20)
+register_button = Button(window, text="注册", command=register, font=("Arial", 14), width=20,bg='lightblue',fg='white')
 register_button.pack(pady=10)
 
 # 创建忘记密码按钮
-forgot_password_button = Button(window, text="忘记密码", command=forgot_password, font=("Arial", 14), width=20)
+forgot_password_button = Button(window, text="忘记密码", command=forgot_password, font=("Arial", 14), width=20,bg='lightblue',fg='white')
 forgot_password_button.pack(pady=10)
 
 # 进入主循环
