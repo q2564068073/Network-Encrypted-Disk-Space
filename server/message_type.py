@@ -270,3 +270,16 @@ def send_file(username, filename, key_hash, client_socket):
             return True
     except Exception:
         return False
+
+def find_file(username,client_socket):
+    try:
+        k=find(username)
+        if k==1:
+            print("该用户没有文件")
+            return False
+        else:
+            es = EncryptedSocket(client_socket)
+            es.send_encrypt(k)
+            return True
+    except Exception:
+        return False
