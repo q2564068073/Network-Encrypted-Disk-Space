@@ -8,7 +8,7 @@ import base64
 import time
 import socket
 from sql_init import *
-# from protocol.communication import *
+from ..protocol.communication import *
 
 email_code_storage = {}
 phone_code_storage = {}
@@ -77,7 +77,7 @@ def login_email(email, auth_code):
         else:       #验证码不正确
             return 1
     else:
-        return 0
+        return 0  
         #邮箱错误（如果在输入邮箱获得验证码之后把邮箱篡改掉，会提示错误）
 
 #向客户端发送手机号验证码 0代表手机号不存在 1代表存在 发送成功
@@ -235,7 +235,6 @@ def add_user_to_shared_space(username, space_name):
         return f"用户 '{username}' 已加入共享空间 '{space_name}'"
     else:
         return "用户或共享空间不存在"
-
 
 def make_folder(path, folder_name):
     os.mkdir(path + folder_name)

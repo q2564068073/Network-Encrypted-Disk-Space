@@ -27,6 +27,8 @@ CREATE TABLE files (
     username VARCHAR(10) NOT NULL,
     filename VARCHAR(100) NOT NULL,
     hash_value VARCHAR(100) NOT NULL,
+    filepath VARCHAR(100) NOT NULL ,
+    UploadDate DATETIME NOT NULL ,
     PRIMARY KEY (username, filename),
     FOREIGN KEY (username) REFERENCES users (username)
 )

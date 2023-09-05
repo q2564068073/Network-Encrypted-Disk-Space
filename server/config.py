@@ -7,7 +7,7 @@ SERVER_DB  = {
     'database' : 'javaweb',
     'charset' : 'utf8',
 }
-SERVER_PORT = 9000
+SERVER_PORT = 8000
 SERVER_PATH = 'C:\\Users\\29923\\Desktop\\server\\Flies\\'
 
 #手机验证码发送账号配置
