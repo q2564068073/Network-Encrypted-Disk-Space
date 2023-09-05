@@ -4,9 +4,13 @@ from tkinter import messagebox, simpledialog
 from tkinter import filedialog
 import os
 class PersonalInfoWindow:
-  def __init__(self, username):
+  def __init__(self, username,client):
+
+    # 初始化用户名和套接字
+    self.username = username
+    client = client
     self.window = Tk()
-    self.window.title("个人主页")
+    self.window.title("个人云端存储主页")
 
     # 获取屏幕的宽度和高度
     screen_width = self.window.winfo_screenwidth()
@@ -27,6 +31,7 @@ class PersonalInfoWindow:
     self.file_storage_menu.add_command(label="显示文件存储", command=self.show_file_storage)
     self.file_storage_menu.add_command(label="上传文件", command=self.upload_file)
     self.file_storage_menu.add_command(label="下载文件", command=self.download_file)
+
     # 创建共享文件菜单
     self.shared_files_menu = Menu(self.menu_bar, tearoff=0, font=("Arial", 14))
     self.menu_bar.add_cascade(label="共享文件", menu=self.shared_files_menu)

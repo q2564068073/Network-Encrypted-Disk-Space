@@ -46,7 +46,7 @@ def login():
         messagebox.showerror("登录失败", "密码错误！")
       elif flag == '2':  # 登录成功
         messagebox.showinfo("登录成功", "登录成功！")
-        PersonalInfoWindow(username)
+        PersonalInfoWindow(username.get(),client)
         # 弹出用户页面
 
     Button(login_window, text="登录", font=("Arial", 14),command=login_by_username).pack()
@@ -90,7 +90,10 @@ def login():
         messagebox.showishowerrornfo("登录失败", "验证码错误！")
       elif flag == '2':
         messagebox.showinfo("登录成功", "登录成功！")
-        PersonalInfoWindow(username)
+        '''
+        最好是使用服务器根据数据库查询到的邮箱匹配的姓名，返回的username
+        '''
+        PersonalInfoWindow('邮箱匹配的姓名',client)
         # 跳转使用界面
 
     Button(login_window, text="登录", font=("Arial", 14), command=login_by_email).pack()
@@ -140,7 +143,7 @@ def register():
         messagebox.showerror("注册失败", "邮箱已存在！")
       elif flag == '2':
         messagebox.showinfo("注册成功", "注册成功！")
-        PersonalInfoWindow(username)     
+        PersonalInfoWindow(username.get(),client)     
         # 跳转使用界面
   # 创建注册按钮，并在点击时调用register_user方法
   Button(register_window, text="注册", font=("Arial", 14), command=register_user).pack()
