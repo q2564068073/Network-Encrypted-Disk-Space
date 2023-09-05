@@ -1,17 +1,17 @@
 import random
+import socket
+import base64
 import urllib #发送请求
 import hashlib #加密
 import os
+import time
 from flask import Flask
 from config import *
-import base64
-import time
-import socket
 from sql_init import *
-from ..protocol.communication import *
 
 email_code_storage = {}
 phone_code_storage = {}
+username_storage = {}
 
 #注册
 def register(username, password, email, phone):
@@ -59,11 +59,12 @@ def get_email_code(email):
     sql_response = login_check_email(email)
     if sql_response == 0:
         return 0   #"邮箱不存在"
-    elif sql_response == 1:
+    else:
         email_message = str("【加密网盘】您的验证码为" + AUTH_CODE + "，30秒内有效。若非本人操作，请忽略此消息。")
         send_email(email, email_message)
         #把正确的email和验证码对应起来放在全局变量里面，等一下需要再次验证
         email_code_storage[email] = AUTH_CODE
+        username_storage[email] = sql_response
         return 1  #发送成功
 
 #判断邮箱和验证码是否正确
@@ -73,7 +74,7 @@ def get_email_code(email):
 def login_email(email, auth_code):
     if email in email_code_storage:
         if auth_code == email_code_storage[email]:   #登陆成功
-            return 2
+            return username_storage[email]
         else:       #验证码不正确
             return 1
     else:
@@ -130,12 +131,13 @@ def md5s(strs):
     m.update(strs.encode("utf8")) #进行加密
     return m.hexdigest()
 
-#给邮件发送验证码 暂未调试
+
+#给邮件发送验证码
 def send_email(email, email_message):
-    smtp_server = 'smtp.qq.com'  # 你的邮件服务器地址
-    smtp_port = 25  # 邮件服务器端口号
-    sender_email = '498618798@qq.com'  # 你的邮箱地址
-    sender_password = 'ueaoenpgwgdgbjcg'  # 你的邮箱密码
+    smtp_server = SMTP_SERVER  # 你的邮件服务器地址
+    smtp_port = SMTP_PORT  # 邮件服务器端口号
+    sender_email = SENDER_EMAIL  # 你的邮箱地址
+    sender_password = SENDER_PASSWORD  # 你的邮箱密码
     recipient_email=email
     subject = '验证码'
 
@@ -205,7 +207,6 @@ def send_email(email, email_message):
         return False
 
 
-
 #给特定的手机号发送验证码
 def send_phone(phone, auth_code):
     sms_api = SMS_API
@@ -220,40 +221,79 @@ def send_phone(phone, auth_code):
     send_url = sms_api + 'sms?' + data  # 拼接url
     urllib.request.urlopen(send_url)  # 发送请求
 
-
+'''
 # 存储共享空间的字典，每个共享空间包含成员和文件
-# shared_spaces = {}
-# def create_shared_space(username,space_name):
-#     shared_spaces[space_name] = {'members': set(), 'files': {}}
-#     add_user_to_shared_space(username,space_name)
-#     return f"共享空间 '{space_name}' 创建成功"
-#
-# def add_user_to_shared_space(username, space_name):
-#     k=check_username(username)
-#     if k==1 and space_name in shared_spaces:
-#         shared_spaces[space_name]['members'].add(username)
-#         return f"用户 '{username}' 已加入共享空间 '{space_name}'"
-#     else:
-#         return "用户或共享空间不存在"
+shared_spaces = {}
+def create_shared_space(username,space_name):
+    shared_spaces[space_name] = {'members': set(), 'files': {}}
+    add_user_to_shared_space(username,space_name)
+    return f"共享空间 '{space_name}' 创建成功"
+    
+def add_user_to_shared_space(username, space_name):
+    k=check_username(username)
+    if k==1 and space_name in shared_spaces:
+        shared_spaces[space_name]['members'].add(username)
+        return f"用户 '{username}' 已加入共享空间 '{space_name}'"
+    else:
+        return "用户或共享空间不存在"
+'''
 
 def make_folder(path, folder_name):
-    os.mkdir(path + folder_name)
+    os.mkdir(path + './'+folder_name)
+    
+#检查是否有重复文件，如果没有才允许上传
+def save_file_check(username,filename,key_hash):
+    k = insert_file(username,filename,key_hash)
+    if k == 0:
+        return 0
+    elif k == 2:
+        return 'ok'
 
-def save_file(username, filename, data, key_hash):
+#把文件保存到指定路径的位置里面去 
+def save_file(username, filename, data):
     try:
-        k=insert_file(username,filename,key_hash)
+        '''
+        k=insert_file(username,filename,key_hash) 
+        # 这个需要补充
+        # 先入表 返回0是已经上传过 返回1是未上传 可以进行上传
+        #k=1
         if k==0:
             return False
-        # 发送文件已存在
-        if not os.path.isdir(f'../file/{username}'):
-            make_folder('../file', username)
-        else:
-            with open(f'../file/{username}/{filename}', 'wb') as f:
-                f.write(data)
-            return True
+        '''
+        # project_folder/
+        #├── script_folder/
+        #│       └── your_script.py
+        #└── file/
+        #       └── orangestar/
+        # 如上 在本script的上级的同级file文件夹中建立新的文件夹 可以根据需求改存储路径
+        # 先拼接路径
+
+        project_directory = os.path.dirname(os.path.dirname(__file__))
+        new_folder_name = username
+        new_folder_path = os.path.join(project_directory, 'file', new_folder_name)
+
+        # 拼接好路径后 进行创建
+        if not os.path.isdir(new_folder_path):
+            #make_folder('../file', username)
+            os.makedirs(new_folder_path)
+        # 创建后开始写文件 写到orangestar/中
+        with open(f'{new_folder_path}/{filename}', 'wb') as f:
+            f.write(data)
+        return True
+    
     except Exception:
         return False
 
+#在数据库里面找到指定用户的文件
+#此处的k注意显示
+def find_file(username):
+    k=find(username)
+    if k==0:
+        return 0
+    else:
+        return k
+
+'''
 def send_file(username, filename, key_hash, client_socket):
     try:
         k=get_file(username,filename,key_hash)
@@ -270,16 +310,4 @@ def send_file(username, filename, key_hash, client_socket):
             return True
     except Exception:
         return False
-
-def find_file(username,client_socket):
-    try:
-        k=find(username)
-        if k==1:
-            print("该用户没有文件")
-            return False
-        else:
-            es = EncryptedSocket(client_socket)
-            es.send_encrypt(k)
-            return True
-    except Exception:
-        return False
+'''

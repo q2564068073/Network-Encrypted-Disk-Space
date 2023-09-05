@@ -9,19 +9,20 @@ class Registration:
   #此处组装信息之前对密码复杂度和邮箱以及手机号进行格式检查，如果不符合要求那么会弹出一个框框
   #该部分在前端完成，如果都符合条件则对各个关键字进行消息组装
   def get_message(self, username, password,email,phone_number):
-
+    '''
     e = check_email(email)             
     p = check_phone_number(phone_number)
     if e == False or p == False:                        
       return "格式错误"
     else:
+    '''
       #对密码部分进行md5哈希（32位）
-      md=hashlib.md5(password.encode('utf-8'))
-      md=md.hexdigest()
-      print(username,md,email,phone_number)
-      message = "register|" + username + "|" + md + "|" + email + "|" + phone_number
-      print(message)
-      return message
+    md=hashlib.md5(password.encode('utf-8'))
+    md=md.hexdigest()
+    print(username,md,email,phone_number)
+    message = "register|" + username + "|" + md + "|" + email + "|" + phone_number
+    print(message)
+    return message
 
 class LoginName:
   def __init__(self):
@@ -118,14 +119,17 @@ class GetPhoneVerificationCode:
     return message
 
 class Upload:
-  def upload_message(self, username,filename,data,key_hash,data_hash,path):
-    with open(path, 'r') as file:
-        # 读取文件内容并存储到变量中
-        message = 'upload'+'|'+username+'|'+filename+'|'+data+'|'+key_hash+'|'+data_hash+'|'+file.read()
+  def upload_message(self, username,filename,key_hash):
+    key_hash = str(key_hash)[2:-1]
+    message = 'upload'+'|'+username+'|'+filename+'|'+ key_hash
     return message
 
   def download_message(self,username,filename,key_hash):
     
     message = 'download'+'|'+username+'|'+filename+'|'+key_hash
+    return message
+
+  def get_list_message(self,username):
+    message = 'get_list' + '|' + username
     return message
   

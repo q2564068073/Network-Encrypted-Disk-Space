@@ -79,6 +79,7 @@ def login_check_password(username,password):
         conn.close()
 
 #登录方式2：通过邮箱和验证码登录
+#登录之后返回用户名
 def login_check_email(email):
     conn = pymysql.connect(
     host=SERVER_DB['host'],
@@ -91,15 +92,16 @@ def login_check_email(email):
     
     try:
         #检查邮箱存在的情况
-        cursor.execute("SELECT * FROM users WHERE email=%s",(email,))
-        if cursor.fetchone() is None:
+        cursor.execute("SELECT username FROM users WHERE email=%s",(email,))
+        select_result = cursor.fetchone()
+        if select_result is None:
             #这里的话邮箱不存在，登录失败了
             #conn.close()
             return 0
         else:
             #这里代表可以登录，需要发送一个邮箱验证码来验证
             #conn.close()
-            return 1
+            return str(select_result)
     except Exception as e:
         print("Error:",e)
         return -1
@@ -154,6 +156,7 @@ def change_my_password(phone,new_password):
     finally:
         conn.close()
 
+#向服务器插入文件，如果文件已存在返回0，插入成功返回2
 def insert_file(username,filename,hash_value):
     conn = pymysql.connect(
         host=SERVER_DB['host'],
@@ -174,7 +177,7 @@ def insert_file(username,filename,hash_value):
         # 插入新文件信息
         cursor.execute("INSERT INTO files (username,filename,hash_value) VALUES (%s,%s,%s)",(username,filename,hash_value))
         conn.commit()
-        # 注册成功
+        # 插入成功
         return 2
     except Exception as e:
         print("Error:", e)
@@ -182,7 +185,34 @@ def insert_file(username,filename,hash_value):
     finally:
         conn.close()
 
+#在数据库里面根据指定的用户名找到其拥有的文件   
+def find(username):
+    conn = pymysql.connect(
+        host=SERVER_DB['host'],
+        user=SERVER_DB['user'],
+        password=SERVER_DB['password'],
+        database=SERVER_DB['database'],
+        charset=SERVER_DB['charset']
+    )
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT filename FROM files WHERE username=%s ", (username,))
+        if cursor.fetchone() is not None:
+            results = []
+            for row in cursor.fetchall():  #fetchall 返回所有符合条件的表项
+                filename = row[0]
+                results.append(filename)
+                return results
+        else:  #如果没有对应的文件的话返回False
+            #conn.commit()
+            return False
+    except Exception as e:
+        print("Error:", e)
+        return -1
+    finally:
+        conn.close()
 
+        
 def get_file(username, filename, hash_value):
     conn = pymysql.connect(
         host=SERVER_DB['host'],
@@ -197,44 +227,17 @@ def get_file(username, filename, hash_value):
         cursor.execute("SELECT hash_valse FROM files WHERE username=%s and filename=%s", (username, filename))
         if cursor.fetchone() is not None:
             if cursor.fetchone()==hash_value:
-                conn.conmmit()
+                #conn.conmmit()
                 return 2
             # 获得权限下载
             else:
-                conn.commit()
+                #conn.commit()
                 return 1
             # 文件解压密码不正确（没有权限）
         else:
-            conn.commit()
+            #conn.commit()
             return 0
         # 不存在该文件
-    except Exception as e:
-        print("Error:", e)
-        return -1
-    finally:
-        conn.close()
-
-def find (username):
-    conn = pymysql.connect(
-        host=SERVER_DB['host'],
-        user=SERVER_DB['user'],
-        password=SERVER_DB['password'],
-        database=SERVER_DB['database'],
-        charset=SERVER_DB['charset']
-    )
-    try:
-        cursor = conn.cursor()
-        # 检查文件名是否已经存在 如果已经存在直接return 0
-        cursor.execute("SELECT filename FROM files WHERE username=%s ", (username,))
-        if cursor.fetchone() is not None:
-            results = []
-            for row in cursor.fetchall():
-                filename = row[0]
-                results.append(filename)
-                return results
-        else:
-            conn.commit()
-            return 1
     except Exception as e:
         print("Error:", e)
         return -1

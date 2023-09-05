@@ -4,74 +4,89 @@ import threading
 import os
 from config import *
 from message_type import *
+from protocol.communication import *
+
 dirPath = SERVER_PATH
 
 def client_handle(client_socket, client_address):
+    safe_socket = EncryptedSocket(client_socket,client_address)
+    #public_key = safe_socket.key
     while True:
         try:
-            message = client_socket.recv(1024).decode()
+            message = safe_socket.recv_decrypt().decode('utf-8',errors = 'ignore')
             if message:
                 print(f"收到来自 {client_address} 的消息: {message}")
-                '''
-                message_return = input('请输入你想回复的消息:')
-                send_back(client_socket,message_return)
-                '''
                 #对于消息去解析其类型和参数
                 message_parts = message.split('|') #用split函数把其分割成一个字典
                 message_type = message_parts[0]
-                print(message_type)
+                #print(message_type)
                 if message_type == 'register':
                     username = message_parts[1]
                     password = message_parts[2]
                     email = message_parts[3]
                     phone = message_parts[4]
                     message_return = register(username,password,email,phone)
-                    send_back(client_socket,str(message_return))
+                    send_back(safe_socket,str(message_return))
                 elif message_type == 'login_password':
                     username = message_parts[1]
                     password = message_parts[2]
                     #print(username,password)
                     message_return = login_password(username,password)
-                    send_back(client_socket,str(message_return))
+                    print(message_return)
+                    send_back(safe_socket,str(message_return))
                 elif message_type == 'get_email_code':
                     email = message_parts[1]
                     message_return = get_email_code(email)
-                    send_back(client_socket,str(message_return))
+                    send_back(safe_socket,str(message_return))
                 elif message_type == 'login_email':
                     email = message_parts[1]
                     auth_code = message_parts[2]
                     message_return = login_email(email,auth_code)
-                    send_back(client_socket,str(message_return))
+                    send_back(safe_socket,str(message_return))
                 elif message_type == 'get_phone_code':
                     phone = message_parts[1]
                     message_return = get_phone_code(phone)
-                    send_back(client_socket,str(message_return))
+                    send_back(safe_socket,str(message_return))
                 elif message_type == 'change_password':
                     phone = message_parts[1]
                     auth_code = message_parts[2]
                     old_password = message_parts[3]
                     new_password = message_parts[4]
                     message_return = change_password(phone,auth_code,old_password,new_password) 
-                    send_back(client_socket,str(message_return))
+                    send_back(safe_socket,str(message_return))
                 elif message_type == 'upload':
                     username = message_parts[1]
                     filename = message_parts[2]
-                    data = message_parts[3]
-                    key_hash = message_parts[4]
-                    data_hash = message_parts[5]
-                    message_return = save_file(username, filename, data, key_hash, data_hash)
+                    key_hash = message_parts[3]
+                    #message_return = save_file(username, filename,key_hash)
+                    message_return_ok = save_file_check(username,filename,key_hash)
+                    send_back(safe_socket,str(message_return_ok))
+                    #记得写个数据库函数把前面的三个关键词入表
+                    if message_return_ok == 'ok':
+                        file = safe_socket.recv_decrypt() #收到加密后的文件
+                        save_file(username,filename,file)
+                        print(file)
+                    #存储加密文件，记得用filename命名
                 elif message_type == 'download':
                     username = message_parts[1]
                     filename = message_parts[2]
                     key_hash = message_parts[3]
-                    message_return = send_file(username, filename, key_hash, client_socket)      
+                    #message_return = send_file(username, filename, key_hash)
+                    send_back(safe_socket,str(message_return))    
+                elif message_type == 'get_list':
+                    username = message_parts[1]
+                    message_return = find_file(username)
+                    if message_return == 0:
+                        send_back(safe_socket,'没有文件')
+                    else:
+                        send_back(safe_socket,str(message_return))
         except:
             print(f"'{client_address}'断开连接")
             client_socket.close()
             break
         
-def send_back(client_socket, message_return):
-    client_socket.send(message_return.encode())
+def send_back(safe_socket, message_return):
+    safe_socket.send_encrypt(message_return.encode())
 
 #定义服务器函数，函数运行
 def server_run():
