@@ -8,7 +8,7 @@ import base64
 import time
 import socket
 from sql_init import *
-from protocol.communication import *
+# from protocol.communication import *
 
 email_code_storage = {}
 phone_code_storage = {}
@@ -77,7 +77,7 @@ def login_email(email, auth_code):
         else:       #验证码不正确
             return 1
     else:
-        return 0  
+        return 0
         #邮箱错误（如果在输入邮箱获得验证码之后把邮箱篡改掉，会提示错误）
 
 #向客户端发送手机号验证码 0代表手机号不存在 1代表存在 发送成功
