@@ -65,6 +65,9 @@ class PersonalInfoWindow:
     # 接收后端返回的个人信息
     # personal_info = self.client.receive()
     #global name
+    '''
+    建立通信，通过username获取个人信息 ---- 问题1
+    '''
     personal_info = {'name': 'name', 'age': 25, 'phone': '1234567890'}
     # 创建表格来展示个人信息
     table_frame = Frame(self.content_frame, bg="white")
@@ -73,16 +76,12 @@ class PersonalInfoWindow:
     # 创建表格的标题行
     name_label = Label(table_frame, text="姓名", font=("Arial", 12, "bold"), bg="white")
     name_label.grid(row=0, column=0, padx=10, pady=5)
-    age_label = Label(table_frame, text="年龄", font=("Arial", 12, "bold"), bg="white")
-    age_label.grid(row=0, column=1, padx=10, pady=5)
     phone_label = Label(table_frame, text="电话号码", font=("Arial", 12, "bold"), bg="white")
     phone_label.grid(row=0, column=2, padx=10, pady=5)
 
     # 创建表格的数据行
     name_value = Label(table_frame, text=personal_info["name"], font=("Arial", 12), bg="white")
     name_value.grid(row=1, column=0, padx=10, pady=5)
-    age_value = Label(table_frame, text=personal_info["age"], font=("Arial", 12), bg="white")
-    age_value.grid(row=1, column=1, padx=10, pady=5)
     phone_value = Label(table_frame, text=personal_info["phone"], font=("Arial", 12), bg="white")
     phone_value.grid(row=1, column=2, padx=10, pady=5)
 
@@ -153,25 +152,23 @@ class PersonalInfoWindow:
     """
     # 打开文件选择对话框
     filepath = filedialog.askopenfilename()
-
     if filepath:
 
       # 获取文件名
       filename = os.path.basename(filepath)
+      print("文件名："+ filename)
       # 获取文件的绝对路径
       absolute_path = os.path.abspath(filepath)
-
-      # 目标保存路径
-      target_folder = r"C:\Users\熊兵\OneDrive\桌面\files"
-      # 构建目标文件的完整路径
-      target_path = os.path.join(target_folder, filename)
-      # 复制文件到目标路径
-      shutil.copyfile(filepath, target_path)
-
-      print(filename, absolute_path)
+      print("文件路径：" + absolute_path)
       # 弹出输入框，让用户输入密钥
       key = simpledialog.askstring("输入密钥", "请输入加密文件的密钥：", show='*')
       confirm_key = simpledialog.askstring("确认密钥", "请再次输入密钥以确认：", show='*')
+      # 密钥加密密钥
+      encrypt_key = simpledialog.askstring('密钥加密密钥','请输入找回文件时的解密密钥',show='*')
+      print(encrypt_key)
+      '''
+      这里需要将key在client端加密，再将key的密文存在服务器，用于对文件的找回 --- 问题2
+      '''
 
       # 检查密钥是否一致
       if key == confirm_key:
@@ -179,13 +176,19 @@ class PersonalInfoWindow:
         print(key)
         '''
         这里添加那个文件查找加密的函数，传入参数为absolute_path,key
-
         '''
-        # file_message = 文件加密函数(absolute_path,key)
-        # file_message = 'hello'
-        # self.client.send(file_message)
-
-        messagebox.showinfo("上传文件", "文件上传成功！")
+        upload = Upload()
+        #username
+        print("用户名："+self.username)
+        data, key_hash = rc4_file(absolute_path, key)
+        message = upload.upload_message(self.username,filename,key_hash)
+        send_message(self.client,message)
+        message_response = receive_message(self.client)
+        if message_response == 'ok':
+          self.client.send_encrypt(data)
+          messagebox.showinfo("上传文件", "文件上传成功！")
+        elif message_response == '0':
+          messagebox.showerror("上传错误","文件已重复上传")
       else:
         messagebox.showerror("密钥错误", "密钥输入不一致，请重新上传文件并输入正确的密钥！")
 
@@ -193,8 +196,15 @@ class PersonalInfoWindow:
     # 获取选中的文件名
     selected_file = self.file_list.get(self.file_list.curselection())
     print(selected_file)
-    # 如果有选中文件
-    if selected_file:
+
+    key = simpledialog.askstring("输入密钥", "请输入加密文件的密钥：", show='*')
+    '''
+    这里需要根据选择的文件名selected_file，来向服务器请求相应的文件数据和key，来匹配
+
+    '''
+    flag = True        # 假设密码正确
+    
+    if flag:
       # 文件下载URL
       '''
       这里的下载文件路径还有问题，暂时用这个代替，按理来说是一个用户点击了一个文件名，选择了下载，客户端应该
@@ -222,7 +232,7 @@ class PersonalInfoWindow:
       else:
         messagebox.showwarning("下载文件", "未选择保存路径！")
     else:
-      messagebox.showwarning("下载文件", "请先选择要下载的文件！")
+      messagebox.showwarning("密码错误", "请重新输入密码！")
 
   def show_shared_files(self):
     # 在内容区域显示共享文件
@@ -317,117 +327,6 @@ class PersonalInfoWindow:
     self.Client.send(message.encode())
     response = self.Client.recv(1024).decode()
     print(response)
-
-
-  def upload_file(self):
-    """
-    上传文件，获取上传文件的绝对路径，名称，以及用户输入的加密文件的密钥。
-    :return:
-    """
-    # 打开文件选择对话框
-    filepath = filedialog.askopenfilename()
-    if filepath:
-
-      # 获取文件名
-      filename = os.path.basename(filepath)
-      print("文件名："+ filename)
-      # 获取文件的绝对路径
-      absolute_path = os.path.abspath(filepath)
-      print("文件路径：" + absolute_path)
-      # 弹出输入框，让用户输入密钥
-      key = simpledialog.askstring("输入密钥", "请输入加密文件的密钥：", show='*')
-      confirm_key = simpledialog.askstring("确认密钥", "请再次输入密钥以确认：", show='*')
-
-      # 检查密钥是否一致
-      if key == confirm_key:
-        # 处理文件上传逻辑
-        print(key)
-        '''
-        这里添加那个文件查找加密的函数，传入参数为absolute_path,key
-        '''
-        upload = Upload()
-        #username
-        print("用户名："+self.username)
-        data, key_hash = rc4_file(absolute_path, key)
-        message = upload.upload_message(self.username,filename,key_hash)
-        send_message(self.client,message)
-        message_response = receive_message(self.client)
-        if message_response == 'ok':
-          self.client.send_encrypt(data)
-          messagebox.showinfo("上传文件", "文件上传成功！")
-        elif message_response == '0':
-          messagebox.showerror("上传错误","文件已重复上传")
-      else:
-        messagebox.showerror("密钥错误", "密钥输入不一致，请重新上传文件并输入正确的密钥！")
-
-  def download_file(self):
-    # 获取选中的文件名
-    selected_file = self.file_list.get(self.file_list.curselection())
-
-    # 如果有选中文件
-    if selected_file:
-      # 文件下载URL
-      '''
-      这里的下载文件路径还有问题，暂时用这个代替，按理来说是一个用户点击了一个文件名，选择了下载，客户端应该
-      将下载信息传给后端，在返回。
-      '''
-      url = "https://example.com/files/" + selected_file
-
-      # 弹出对话框，让用户选择保存文件的路径和文件名
-      file_path = filedialog.asksaveasfilename()
-
-      # 如果用户选择了保存路径
-      if file_path:
-        try:
-          urllib.request.urlretrieve(url, file_path)
-          messagebox.showinfo("下载文件", "文件下载成功！")
-        except Exception as e:
-          messagebox.showerror("下载文件", "文件下载失败：" + str(e))
-      else:
-        messagebox.showwarning("下载文件", "未选择保存路径！")
-    else:
-      messagebox.showwarning("下载文件", "请先选择要下载的文件！")
-
-  def show_shared_files(self):
-    # 在内容区域显示共享文件
-    self.clear_content_frame()
-    self.content_frame.config(bg="lightgray")
-    # 添加显示共享文件的代码
-    shared_files_label = Label(self.content_frame, text="共享文件列表", font=("Arial", 14))
-    shared_files_label.pack(pady=10)
-    self.shared_files_list = Listbox(self.content_frame, font=("Arial", 12), width=60, height=20)
-    self.shared_files_list.pack()
-    # 添加下载共享文件按钮
-    download_shared_button = Button(self.content_frame, text="下载共享文件", font=("Arial", 12), command=self.download_shared_file)
-    download_shared_button.pack(pady=10)
-
-  def upload_shared_file(self):
-    # 打开文件选择对话框
-    filepath = filedialog.askopenfilename()
-    if filepath:
-      # 处理共享文件上传逻辑
-      #
-      filename = filepath.split("/")[-1]  # 获取文件名
-      self.shared_files_list.insert(END, filename)
-      messagebox.showinfo("上传共享文件", "共享文件上传成功！")
-
-  def download_shared_file(self):
-    # 获取选中的共享文件名
-    selected_shared_file = self.shared_files_list.get(self.shared_files_list.curselection())
-    if selected_shared_file:
-      # 处理共享文件下载逻辑
-      #
-      messagebox.showinfo("下载共享文件", "共享文件下载成功！")
-
-  def refresh_window(self,username):
-    # 刷新窗口的方法，关闭当前窗口并重新创建一个新的个人主页窗口
-    self.window.destroy()
-    PersonalInfoWindow(username=username)
-
-  def clear_content_frame(self):
-    # 清空内容区域
-    for widget in self.content_frame.winfo_children():
-      widget.destroy()
 
 #发送消息
 def send_message(safe_socket,message):
