@@ -167,7 +167,7 @@ def insert_file(username,filename,hash_value):
     )
     try:
         cursor = conn.cursor()
-        # 检查用户名是否已经存在了 如果已经存在直接return 0
+        # 检查文件名是否已经存在了 如果已经存在直接return 0
         cursor.execute("SELECT * FROM files WHERE username=%s and filename=%s", (username,filename))
         if cursor.fetchone() is not None:
             # 该文件已存在
@@ -243,3 +243,31 @@ def get_file(username, filename, hash_value):
         return -1
     finally:
         conn.close()
+
+def find (username):
+    conn = pymysql.connect(
+        host=SERVER_DB['host'],
+        user=SERVER_DB['user'],
+        password=SERVER_DB['password'],
+        database=SERVER_DB['database'],
+        charset=SERVER_DB['charset']
+    )
+    try:
+        cursor = conn.cursor()
+        # 检查文件名是否已经存在 如果已经存在直接return 0
+        cursor.execute("SELECT filename FROM files WHERE username=%s ", (username,))
+        if cursor.fetchone() is not None:
+            results = []
+            for row in cursor.fetchall():
+                filename = row[0]
+                results.append(filename)
+                return results
+        else:
+            conn.commit()
+            return 1
+    except Exception as e:
+        print("Error:", e)
+        return -1
+    finally:
+        conn.close()
+
