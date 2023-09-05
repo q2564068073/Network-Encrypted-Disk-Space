@@ -222,25 +222,29 @@ def send_phone(phone, auth_code):
 
 
 # 存储共享空间的字典，每个共享空间包含成员和文件
-shared_spaces = {}
-def create_shared_space(username,space_name):
-    shared_spaces[space_name] = {'members': set(), 'files': {}}
-    add_user_to_shared_space(username,space_name)
-    return f"共享空间 '{space_name}' 创建成功"
-
-def add_user_to_shared_space(username, space_name):
-    k=check_username(username)
-    if k==1 and space_name in shared_spaces:
-        shared_spaces[space_name]['members'].add(username)
-        return f"用户 '{username}' 已加入共享空间 '{space_name}'"
-    else:
-        return "用户或共享空间不存在"
+# shared_spaces = {}
+# def create_shared_space(username,space_name):
+#     shared_spaces[space_name] = {'members': set(), 'files': {}}
+#     add_user_to_shared_space(username,space_name)
+#     return f"共享空间 '{space_name}' 创建成功"
+#
+# def add_user_to_shared_space(username, space_name):
+#     k=check_username(username)
+#     if k==1 and space_name in shared_spaces:
+#         shared_spaces[space_name]['members'].add(username)
+#         return f"用户 '{username}' 已加入共享空间 '{space_name}'"
+#     else:
+#         return "用户或共享空间不存在"
 
 def make_folder(path, folder_name):
     os.mkdir(path + folder_name)
 
-def save_file(username, filename, data, key_hash, data_hash):
+def save_file(username, filename, data, key_hash):
     try:
+        k=insert_file(username,filename,key_hash)
+        if k==0:
+            return False
+        # 发送文件已存在
         if not os.path.isdir(f'../file/{username}'):
             make_folder('../file', username)
         else:
@@ -252,12 +256,17 @@ def save_file(username, filename, data, key_hash, data_hash):
 
 def send_file(username, filename, key_hash, client_socket):
     try:
-        # 查数据库校验hash
-        pass
-        with open(f'../file/{username}/{filename}', 'rb') as f:
-            data = f.read()
-            es = EncryptedSocket(client_socket)
-            es.send_encrypt(data)
-        return True
+        k=get_file(username,filename,key_hash)
+        if k==1:
+            print('解压密码错误')
+            return False
+        elif k==0:
+            print('文件不存在')
+        else:
+            with open(f'../file/{username}/{filename}', 'rb') as f:
+                data = f.read()
+                es = EncryptedSocket(client_socket)
+                es.send_encrypt(data)
+            return True
     except Exception:
         return False

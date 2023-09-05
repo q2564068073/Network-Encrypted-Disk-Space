@@ -153,3 +153,63 @@ def change_my_password(phone,new_password):
         return -1
     finally:
         conn.close()
+
+def insert_file(username,filename,hash_value):
+    conn = pymysql.connect(
+        host=SERVER_DB['host'],
+        user=SERVER_DB['user'],
+        password=SERVER_DB['password'],
+        database=SERVER_DB['database'],
+        charset=SERVER_DB['charset']
+    )
+    try:
+        cursor = conn.cursor()
+        # 检查用户名是否已经存在了 如果已经存在直接return 0
+        cursor.execute("SELECT * FROM files WHERE username=%s and filename=%s", (username,filename))
+        if cursor.fetchone() is not None:
+            # 该文件已存在
+            # conn.close()
+            return 0
+
+        # 插入新文件信息
+        cursor.execute("INSERT INTO files (username,filename,hash_value) VALUES (%s,%s,%s)",(username,filename,hash_value))
+        conn.commit()
+        # 注册成功
+        return 2
+    except Exception as e:
+        print("Error:", e)
+        return -1
+    finally:
+        conn.close()
+
+
+def get_file(username, filename, hash_value):
+    conn = pymysql.connect(
+        host=SERVER_DB['host'],
+        user=SERVER_DB['user'],
+        password=SERVER_DB['password'],
+        database=SERVER_DB['database'],
+        charset=SERVER_DB['charset']
+    )
+    try:
+        cursor = conn.cursor()
+        # 检查文件名是否已经存在 如果已经存在直接return 0
+        cursor.execute("SELECT hash_valse FROM files WHERE username=%s and filename=%s", (username, filename))
+        if cursor.fetchone() is not None:
+            if cursor.fetchone()==hash_value:
+                conn.conmmit()
+                return 2
+            # 获得权限下载
+            else:
+                conn.commit()
+                return 1
+            # 文件解压密码不正确（没有权限）
+        else:
+            conn.commit()
+            return 0
+        # 不存在该文件
+    except Exception as e:
+        print("Error:", e)
+        return -1
+    finally:
+        conn.close()
