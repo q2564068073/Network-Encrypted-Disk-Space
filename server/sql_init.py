@@ -193,7 +193,6 @@ def get_file(username, filename, hash_value):
     )
     try:
         cursor = conn.cursor()
-        # 检查文件名是否已经存在 如果已经存在直接return 0
         cursor.execute("SELECT hash_valse FROM files WHERE username=%s and filename=%s", (username, filename))
         if cursor.fetchone() is not None:
             if cursor.fetchone()==hash_value:
@@ -214,7 +213,7 @@ def get_file(username, filename, hash_value):
     finally:
         conn.close()
 
-def find (username):
+def find(username,hash_value):
     conn = pymysql.connect(
         host=SERVER_DB['host'],
         user=SERVER_DB['user'],
@@ -227,14 +226,160 @@ def find (username):
         # 检查文件名是否已经存在 如果已经存在直接return 0
         cursor.execute("SELECT filename FROM files WHERE username=%s ", (username,))
         if cursor.fetchone() is not None:
-            results = []
-            for row in cursor.fetchall():
-                filename = row[0]
-                results.append(filename)
-                return results
+            if cursor.fetchone() == hash_value:
+                # conn.conmmit()
+                return 2
+            # 获得权限下载
+            else:
+                # conn.commit()
+                return 1
+            # 文件解压密码不正确（没有权限）
+        else:
+            # conn.commit()
+            return 0
+        # 不存在该文件
+    except Exception as e:
+        print("Error:", e)
+        return -1
+    finally:
+        conn.close()
+
+def create_group(spacename,hash_value):
+        conn = pymysql.connect(
+            host=SERVER_DB['host'],
+            user=SERVER_DB['user'],
+            password=SERVER_DB['password'],
+            database=SERVER_DB['database'],
+            charset=SERVER_DB['charset']
+        )
+        print("连接可以了")
+        try:
+            cursor = conn.cursor()
+            # 检查群名是否已经存在了 如果已经存在直接return 0
+            cursor.execute("SELECT * FROM group_key WHERE spacename=%s", (spacename,))
+            if cursor.fetchone() is not None:
+                # 群名已存在
+                # conn.close()
+                return 0
+
+            # 插入群信息
+            cursor.execute("INSERT INTO group_key(spacename,hash_value) VALUES (%s,%s)",(spacename,hash_value))
+            conn.commit()
+            # 注册成功
+            return 2
+        except Exception as e:
+            # 发生异常时记录错误日志或返回错误信息
+            print("Error:", e)
+            return -1
+        finally:
+            # 关闭数据库连接
+            conn.close()
+
+def login_group(spacename,key_hash):
+    conn = pymysql.connect(
+        host=SERVER_DB['host'],
+        user=SERVER_DB['user'],
+        password=SERVER_DB['password'],
+        database=SERVER_DB['database'],
+        charset=SERVER_DB['charset']
+    )
+    # print("连接可以了")
+    # 检查群名存在情况
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM group_key WHERE spacename=%s", (spacename,))
+        group = cursor.fetchone()  # 这里的group是一个完整的查询结果，(spacename,key_hash,...)
+        if group is None:
+            # 群名是不存在的，要提醒一下没有这个群
+            # conn.close()
+            return 0
+        else:
+            if key_hash == group[1]:
+                # conn.close()
+                return 2  # 这里是登录成功了，记得给一个返回值
+            else:
+                # conn.close()
+                return 1  # 这里是密码错误了，记得返回登录失败
+    except Exception as e:
+        print("Error:", e)
+        return -1
+    finally:
+        conn.close()
+
+def insert_group_file(spacename,filename):
+    conn = pymysql.connect(
+        host=SERVER_DB['host'],
+        user=SERVER_DB['user'],
+        password=SERVER_DB['password'],
+        database=SERVER_DB['database'],
+        charset=SERVER_DB['charset']
+    )
+    try:
+        cursor = conn.cursor()
+        # 检查文件名是否已经存在了 如果已经存在直接return 0
+        cursor.execute("SELECT * FROM group_file WHERE spacename=%s and filename=%s", (spacename,filename))
+        if cursor.fetchone() is not None:
+            # 该文件已存在
+            # conn.close()
+            return 0
+
+        # 插入新文件信息
+        cursor.execute("INSERT INTO group_file (spacename,filename) VALUES (%s,%s)",(spacename,filename))
+        conn.commit()
+        # 注册成功
+        return 2
+    except Exception as e:
+        print("Error:", e)
+        return -1
+    finally:
+        conn.close()
+
+def get_group_file(spacename, filename):
+    conn = pymysql.connect(
+        host=SERVER_DB['host'],
+        user=SERVER_DB['user'],
+        password=SERVER_DB['password'],
+        database=SERVER_DB['database'],
+        charset=SERVER_DB['charset']
+    )
+    try:
+        cursor = conn.cursor()
+        # 检查文件名是否已经存在 如果已经存在直接return 0
+        cursor.execute("SELECT * FROM group_file WHERE spacename=%s and filename=%s", (spacename, filename))
+        if cursor.fetchone() is not None:
+                conn.conmmit()
+                return 2
+            # 获得权限下载
         else:
             conn.commit()
-            return 1
+            return 0
+        # 不存在该文件
+    except Exception as e:
+        print("Error:", e)
+        return -1
+    finally:
+        conn.close()
+
+def find_group_file(spacename):
+    conn = pymysql.connect(
+        host=SERVER_DB['host'],
+        user=SERVER_DB['user'],
+        password=SERVER_DB['password'],
+        database=SERVER_DB['database'],
+        charset=SERVER_DB['charset']
+    )
+    try:
+        cursor = conn.cursor()
+        # 检查文件名是否已经存在 如果已经存在直接return 0
+        cursor.execute("SELECT filename FROM group_file WHERE spacename=%s ", (spacename,))
+        if cursor.fetchone() is not None:
+                # conn.conmmit()
+                return 2
+            # 获得权限查看列表
+        else:
+            # conn.commit()
+            return 0
+        # 该群不存在文件
     except Exception as e:
         print("Error:", e)
         return -1

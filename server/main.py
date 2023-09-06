@@ -33,7 +33,27 @@ CREATE TABLE files (
 """
 
 cursor.execute(create_files_table)
-    
+
+create_group_key_table="""
+CREATE TABLE group_key (
+    spacename VARCHAR(100) NOT NULL,
+    hash_value VARCHAR(100) NOT NULL,
+    PRIMARY KEY (spacename,hash_value),
+)
+"""
+
+cursor.execute(create_group_key_table)
+
+create_group_file_table="""
+CREATE TABLE group_file (
+    spacename VARCHAR(100) NOT NULL,
+    filename VARCHAR(100) NOT NULL,
+    PRIMARY KEY (spacename, filename),
+    FOREIGN KEY (spacename) REFERENCES group_key (spacename)
+)
+"""
+cursor.execute(create_group_file_table)
+
 #提交
 conn.commit()
 cursor.close()

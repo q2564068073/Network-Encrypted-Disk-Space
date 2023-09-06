@@ -220,21 +220,38 @@ def send_phone(phone, auth_code):
     send_url = sms_api + 'sms?' + data  # 拼接url
     urllib.request.urlopen(send_url)  # 发送请求
 
-# 存储共享空间的字典，每个共享空间包含成员和文件
-shared_spaces = {}
-def create_shared_space(username,space_name):
-    shared_spaces[space_name] = {'members': set()}
+# # 存储共享空间的字典，每个共享空间包含成员和文件
+# shared_spaces = {}
+# # def create_shared_space(username,space_name,key_hash):
+# #     shared_spaces[space_name] = {'members': set(),'key':key_hash}
+# #     if not os.path.isdir(f'../file/space/{space_name}'):
+# #         make_folder('../file/space', space_name)
+# #     add_user_to_shared_space(username,space_name)
+# #     return f"共享空间 '{space_name}' 创建成功"
+# #
+# # def add_user_to_shared_space(username, space_name,key_hash):
+# #     if  space_name in shared_spaces and key_hash==shared_spaces[space_name]['key']:
+# #         shared_spaces[space_name]['members'].add(username)
+# #         return f"用户 '{username}' 已加入共享空间 '{space_name}'"
+# #     else:
+# #         return "用户或共享空间不存在"
+
+
+def create_shared_space(username,space_name,key_hash):
+    shared_spaces[space_name] = {'members': set(),'key':key_hash}
     if not os.path.isdir(f'../file/space/{space_name}'):
         make_folder('../file/space', space_name)
     add_user_to_shared_space(username,space_name)
     return f"共享空间 '{space_name}' 创建成功"
 
-def add_user_to_shared_space(username, space_name):
-    if  space_name in shared_spaces and username in shared_spaces[space_name]['members']:
-        shared_spaces[space_name]['members'].add(username)
-        return f"用户 '{username}' 已加入共享空间 '{space_name}'"
-    else:
-        return "用户或共享空间不存在"
+
+
+
+
+
+
+
+
 
 def make_folder(path, folder_name):
     os.mkdir(path + folder_name)
@@ -284,17 +301,32 @@ def find_file(username,client_socket):
     except Exception:
         return False
 
-def save_qfile(spacename,filename,data):
-    try:
-        directory_path=f'../file/space/{spacename}'
-        file_path = os.path.join(directory_path, filename)
-        if os.path.isfile(file_path):
-            print('文件已存在于共享空间')
-            return False
-        else:
-            with open(f'../file/space/{spacename}/{filename}', 'wb') as f:
-                f.write(data)
-            return True
-    except Exception:
-        return False
-
+# def save_qfile(spacename,filename,data):
+#     try:
+#         directory_path=f'../file/space/{spacename}'
+#         file_path = os.path.join(directory_path, filename)
+#         if os.path.isfile(file_path):
+#             print('文件已存在于共享空间')
+#             return False
+#         else:
+#             with open(f'../file/space/{spacename}/{filename}', 'wb') as f:
+#                 f.write(data)
+#             return True
+#     except Exception:
+#         return False
+#
+# def get_qfile(spacename,filename,client_socket):
+#     try:
+#         directory_path=f'../file/space/{spacename}'
+#         file_path = os.path.join(directory_path, filename)
+#         if os.path.isfile(file_path):
+#             with open(f'../file/{spacename}/{filename}', 'rb') as f:
+#                 data = f.read()
+#                 es = EncryptedSocket(client_socket)
+#                 es.send_encrypt(data)
+#             return True
+#         else:
+#             print('文件不存在')
+#             return False
+#     except Exception:
+#         return False
